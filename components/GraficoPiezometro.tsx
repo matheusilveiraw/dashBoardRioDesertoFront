@@ -58,17 +58,13 @@ export default function GraficoPiezometro() {
                 fimFormatado
             );
 
-            // cópia + ordenação por segurança
             let dados = [...resposta.data].sort((a: any, b: any) => {
                 return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
             });
 
-            // manter reverse (conforme solicitado)
-            //dados = dados.reverse();
-
             // labels usando apenas MES/ANO
             const labels = dados.map((item: any) => {
-                const [ano, mes] = item.mes_ano.split("-"); // ignora o dia
+                const [ano, mes] = item.mes_ano.split("-"); // pra ignorar o dia pq mantive date no backend 
                 return new Date(Number(ano), Number(mes) - 1).toLocaleDateString("pt-BR", {
                     month: "short",
                     year: "numeric"
