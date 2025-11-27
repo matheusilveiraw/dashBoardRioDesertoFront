@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
+import { Button } from "primereact/button";
 
 import { getPiezometrosAtivos, getPiezometroPorIdDataInicioDataFimApi } from "@/service/api";
 import { formatarData } from "@/utils/formatarData";
@@ -57,14 +58,22 @@ export default function GraficoPiezometro() {
                 fimFormatado
             );
 
-            const dados = [...resposta.data].reverse();
+            // cópia + ordenação por segurança
+            let dados = [...resposta.data].sort((a: any, b: any) => {
+                return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
+            });
 
-            const labels = dados.map((item: any) =>
-                new Date(item.mes_ano).toLocaleDateString("pt-BR", {
+            // manter reverse (conforme solicitado)
+            //dados = dados.reverse();
+
+            // labels usando apenas MES/ANO
+            const labels = dados.map((item: any) => {
+                const [ano, mes] = item.mes_ano.split("-"); // ignora o dia
+                return new Date(Number(ano), Number(mes) - 1).toLocaleDateString("pt-BR", {
                     month: "short",
                     year: "numeric"
-                })
-            );
+                });
+            });
 
             const precipitacao = dados.map((item: any) => item.precipitacao);
             const vazao = dados.map((item: any) => item.vazao_bombeamento);
@@ -130,13 +139,18 @@ export default function GraficoPiezometro() {
                     placeholder="Fim"
                 />
 
-                <button onClick={buscarGrafico}>Buscar</button>
+                <Button 
+                    label="Buscar" 
+                    icon="pi pi-search" 
+                    onClick={buscarGrafico}
+                    severity="info"
+                    rounded
+                />
             </div>
 
             {/* GRÁFICO */}
             {lineData ? (
                 <Chart type="line" data={lineData} options={lineOptions} />
-                
             ) : (
                 <p>Nenhum gráfico carregado ainda.</p>
             )}

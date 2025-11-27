@@ -1,5 +1,5 @@
-export function formatarData(date: Date): string {
-    const mes = String(date.getMonth() + 1).padStart(2, "0");
-    const ano = date.getFullYear();
+export function formatarData(data: Date) {
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
     return `${mes}/${ano}`;
 }
