@@ -56,17 +56,17 @@
         "async": false
       }
     },
-    "(app-client)/./layout/layout.tsx": {
+    "(app-client)/./node_modules/primeicons/primeicons.css": {
       "*": {
-        "id": "(sc_client)/./layout/layout.tsx",
+        "id": "(sc_client)/./node_modules/primeicons/primeicons.css",
         "name": "*",
         "chunks": [],
         "async": false
       }
     },
-    "(app-client)/./node_modules/primeicons/primeicons.css": {
+    "(app-client)/./layout/layout.tsx": {
       "*": {
-        "id": "(sc_client)/./node_modules/primeicons/primeicons.css",
+        "id": "(sc_client)/./layout/layout.tsx",
         "name": "*",
         "chunks": [],
         "async": false
@@ -171,14 +171,6 @@
       ],
       "async": false
     },
-    "/home/matheus/Documentos/dashBoardRioDeserto/layout/layout.tsx": {
-      "id": "(app-client)/./layout/layout.tsx",
-      "name": "*",
-      "chunks": [
-        "app/(main)/layout:static/chunks/app/(main)/layout.js"
-      ],
-      "async": false
-    },
     "/home/matheus/Documentos/dashBoardRioDeserto/node_modules/primereact/resources/themes/lara-light-blue/theme.css": {
       "id": "(app-client)/./node_modules/primereact/resources/themes/lara-light-blue/theme.css",
       "name": "*",
@@ -197,6 +189,14 @@
     },
     "/home/matheus/Documentos/dashBoardRioDeserto/node_modules/primeicons/primeicons.css": {
       "id": "(app-client)/./node_modules/primeicons/primeicons.css",
+      "name": "*",
+      "chunks": [
+        "app/(main)/layout:static/chunks/app/(main)/layout.js"
+      ],
+      "async": false
+    },
+    "/home/matheus/Documentos/dashBoardRioDeserto/layout/layout.tsx": {
+      "id": "(app-client)/./layout/layout.tsx",
       "name": "*",
       "chunks": [
         "app/(main)/layout:static/chunks/app/(main)/layout.js"

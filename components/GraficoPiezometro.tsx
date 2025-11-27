@@ -140,7 +140,11 @@ async function buscarGrafico() {
                     options={piezometros}
                     onChange={(e) => setIdSelecionado(e.value)}
                     placeholder="Selecione um piezômetro"
-                    style={{ width: "250px" }}
+                    style={{ width: "300px" }}
+                    filter
+                    filterPlaceholder="Buscar..."
+                    filterBy="label"   // pesquisa no label
+                    showClear
                 />
 
                 <Calendar
