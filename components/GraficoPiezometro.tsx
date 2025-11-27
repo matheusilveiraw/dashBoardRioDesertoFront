@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
 
 import { getPiezometrosAtivos, getPiezometroPorIdDataInicioDataFimApi } from "@/service/api";
@@ -22,7 +23,12 @@ export default function GraficoPiezometro() {
         async function carregarPiezometros() {
             try {
                 const resposta = await getPiezometrosAtivos();
-                setPiezometros(resposta.data);
+                setPiezometros(
+                    resposta.data.map((p: any) => ({
+                        label: `${p.idPiezometro} - ${p.nomePiezometro}`,
+                        value: p.cdPiezometro
+                    }))
+                );
             } catch (e) {
                 console.error("Erro ao carregar piezômetros", e);
             }
@@ -100,17 +106,13 @@ export default function GraficoPiezometro() {
             {/* FILTROS */}
             <div style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
 
-                <select
-                    value={idSelecionado ?? ""}
-                    onChange={(e) => setIdSelecionado(Number(e.target.value))}
-                >
-                    <option value="">Selecione um piezômetro</option>
-                    {piezometros.map((p: any) => (
-                        <option key={p.cdPiezometro} value={p.cdPiezometro}>
-                            {p.idPiezometro} - {p.nomePiezometro}
-                        </option>
-                    ))}
-                </select>
+                <Dropdown
+                    value={idSelecionado}
+                    options={piezometros}
+                    onChange={(e) => setIdSelecionado(e.value)}
+                    placeholder="Selecione um piezômetro"
+                    style={{ width: "250px" }}
+                />
 
                 <Calendar
                     value={dataInicio}
@@ -134,6 +136,7 @@ export default function GraficoPiezometro() {
             {/* GRÁFICO */}
             {lineData ? (
                 <Chart type="line" data={lineData} options={lineOptions} />
+                
             ) : (
                 <p>Nenhum gráfico carregado ainda.</p>
             )}
