@@ -5,7 +5,6 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
 import { Button } from "primereact/button";
-import { MultiSelect } from "primereact/multiselect";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
@@ -20,7 +19,7 @@ export default function GraficoPiezometro() {
     const [idSelecionado, setIdSelecionado] = useState<number | null>(null);
     const [tipoSelecionado, setTipoSelecionado] = useState<string | null>(null);
 
-    const [tiposSelecionados, setTiposSelecionados] = useState([]);
+    const [tipoFiltroSelecionado, setTipoFiltroSelecionado] = useState<string | null>(null);
     const [carregando, setCarregando] = useState(false);
 
     const [dataInicio, setDataInicio] = useState<Date | null>(null);
@@ -39,18 +38,23 @@ export default function GraficoPiezometro() {
     });
     const [tabelaDados, setTabelaDados] = useState<any[]>([]);
 
-    const tiposPiezometros = [
+    // Opções para o dropdown de filtro
+    const opcoesFiltro = [
+        { label: "Todos os Tipos", value: null },
         { label: "PP - Piezômetro de Profundidade", value: "PP" },
         { label: "PR - Régua", value: "PR" },
         { label: "PV - Ponto de Vazão", value: "PV" },
         { label: "PC - Calhas", value: "PC" }
     ];
 
-    const carregarPiezometrosFiltrados = async (tiposFiltro = []) => {
+    const carregarPiezometrosFiltrados = async (tipoFiltro: string | null = null) => {
         setCarregando(true);
         try {
-            const resposta = await getPiezometrosAtivos(tiposFiltro);
+            // Se tipoFiltro for null, carrega todos. Senão, passa como array com um único elemento
+            const filtroArray = tipoFiltro ? [tipoFiltro] : [];
+            const resposta = await getPiezometrosAtivos(filtroArray);
             
+            // Filtrar piezômetros: excluir os do tipo "PB"
             const piezometrosFiltrados = resposta.data.filter((p: any) => p.tipoPiezometro !== "PB");
             
             const piezometrosFormatados = piezometrosFiltrados.map((p: any) => ({
@@ -87,14 +91,17 @@ export default function GraficoPiezometro() {
         }
     };
 
+    // Carregar inicialmente sem filtro (todos)
     useEffect(() => {
-        carregarPiezometrosFiltrados();
+        carregarPiezometrosFiltrados(null);
     }, []);
 
+    // Recarregar quando o filtro de tipo mudar
     useEffect(() => {
-        carregarPiezometrosFiltrados(tiposSelecionados);
-    }, [tiposSelecionados]);
+        carregarPiezometrosFiltrados(tipoFiltroSelecionado);
+    }, [tipoFiltroSelecionado]);
 
+    // Função auxiliar para verificar se é PC ou PV
     function eTipoCalhasOuPontoVazao(tipo: string): boolean {
         return tipo === 'PC' || tipo === 'PV';
     }
@@ -141,6 +148,7 @@ export default function GraficoPiezometro() {
                 });
             });
 
+            // Usar o tipoSelecionado diretamente
             const tipoPiezometro = tipoSelecionado;
             const ehPCouPV = eTipoCalhasOuPontoVazao(tipoPiezometro || '');
 
@@ -155,6 +163,7 @@ export default function GraficoPiezometro() {
             ];
 
             if (tipoPiezometro === 'PP') {
+                // PP: Nível Estático, Cota Superfície, Cota Base, Vazão Mina
                 datasets.push(
                     { 
                         label: "Vazão Mina", 
@@ -190,6 +199,7 @@ export default function GraficoPiezometro() {
                     }
                 );
             } else if (tipoPiezometro === 'PR') {
+                // PR: Cota, Nível Estático, Vazão Mina
                 datasets.push(
                     { 
                         label: "Vazão Mina", 
@@ -214,6 +224,7 @@ export default function GraficoPiezometro() {
                     }
                 );
             } else if (ehPCouPV) {
+                // PC ou PV: Vazão (vazao_calha) e Vazão Mina (vazao_bombeamento)
                 datasets.push(
                     { 
                         label: "Vazão Mina", 
@@ -237,6 +248,7 @@ export default function GraficoPiezometro() {
                 datasets
             });
 
+            // Calcular médias baseadas no tipo
             const total = dados.length;
             const avgPrecip = total > 0 ? dados.reduce((acc: number, curr: any) => acc + (curr.precipitacao || 0), 0) / total : 0;
             const avgVazaoMina = total > 0 ? dados.reduce((acc: number, curr: any) => acc + (curr.vazao_bombeamento || 0), 0) / total : 0;
@@ -269,6 +281,7 @@ export default function GraficoPiezometro() {
 
             setTabelaDados(dados);
 
+            // Configurar opções do gráfico
             const yAxisConfig: any = {
                 type: "linear",
                 display: true,
@@ -281,8 +294,10 @@ export default function GraficoPiezometro() {
                 }
             };
 
+            // Ajustar títulos dos eixos baseado no tipo
             if (ehPCouPV) {
-                yAxisConfig.display = false; 
+                // PC ou PV: apenas eixo direito com vazões e precipitação
+                yAxisConfig.display = false; // Esconde eixo esquerdo
                 
                 setLineOptions({
                     maintainAspectRatio: false,
@@ -323,6 +338,7 @@ export default function GraficoPiezometro() {
                     }
                 });
             } else {
+                // PP e PR: eixo esquerdo para nível/cota, direito para precipitação/vazão
                 yAxisConfig.title = {
                     display: true,
                     text: 'Nível/Cota (m)',
@@ -379,11 +395,13 @@ export default function GraficoPiezometro() {
         }
     }
 
+    // Função para renderizar a tabela baseada no tipo
     const renderizarColunasTabela = () => {
         if (tabelaDados.length === 0 || !tipoSelecionado) return null;
 
         const ehPCouPV = eTipoCalhasOuPontoVazao(tipoSelecionado);
 
+        // Colunas comuns a todos os tipos
         let colunas = [
             <Column 
                 key="data"
@@ -397,6 +415,7 @@ export default function GraficoPiezometro() {
             />
         ];
 
+        // Adicionar colunas específicas de cada tipo
         if (tipoSelecionado === 'PP') {
             colunas.push(
                 <Column 
@@ -494,6 +513,7 @@ export default function GraficoPiezometro() {
 
     const renderizarCards = () => {
         if (!tipoSelecionado) {
+            // Estado inicial (sem dados)
             return (
                 <div className="grid mb-4">
                     <div className="col-12 md:col-6 lg:col-3">
@@ -656,13 +676,13 @@ export default function GraficoPiezometro() {
             <div className="card filter-bar">
                 <div className="filter-item">
                     <span className="filter-label">Visualização</span>
-                    <MultiSelect
-                        value={tiposSelecionados}
-                        options={tiposPiezometros}
-                        onChange={(e) => setTiposSelecionados(e.value)}
-                        placeholder="Tipos"
-                        display="chip"
+                    <Dropdown
+                        value={tipoFiltroSelecionado}
+                        options={opcoesFiltro}
+                        onChange={(e) => setTipoFiltroSelecionado(e.value)}
+                        placeholder="Selecione o tipo"
                         className="w-full md:w-15rem"
+                        showClear
                     />
                 </div>
 
