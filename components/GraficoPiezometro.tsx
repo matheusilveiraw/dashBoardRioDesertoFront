@@ -163,22 +163,8 @@ export default function GraficoPiezometro() {
             ];
 
             if (tipoPiezometro === 'PP') {
-                // PP: Nível Estático, Cota Superfície, Cota Base, Vazão Mina
                 datasets.push(
-                    { 
-                        label: "Vazão Mina", 
-                        data: dados.map((i: any) => i.vazao_bombeamento), 
-                        borderColor: '#00bb7e', 
-                        tension: 0.4, 
-                        yAxisID: 'y1' 
-                    },
-                    { 
-                        label: "Nível Estático", 
-                        data: dados.map((i: any) => i.nivel_estatico), 
-                        borderColor: '#ff6384', 
-                        tension: 0.4, 
-                        yAxisID: 'y' 
-                    },
+                    // Cotas no fundo (ordem mais baixa)
                     {
                         label: "Cota Superfície",
                         data: dados.map((i: any) => i.cota_superficie),
@@ -186,7 +172,8 @@ export default function GraficoPiezometro() {
                         tension: 0.4,
                         yAxisID: 'y',
                         borderDash: [5, 5],
-                        pointRadius: 0
+                        pointRadius: 0,
+                        order: 1
                     },
                     {
                         label: "Cota Base",
@@ -195,7 +182,25 @@ export default function GraficoPiezometro() {
                         tension: 0.4,
                         yAxisID: 'y',
                         borderDash: [5, 5],
-                        pointRadius: 0
+                        pointRadius: 0,
+                        order: 2
+                    },
+                    { 
+                        label: "Vazão Mina", 
+                        data: dados.map((i: any) => i.vazao_bombeamento), 
+                        borderColor: '#00bb7e', 
+                        borderWidth: 1, // Mais fina
+                        tension: 0.4, 
+                        yAxisID: 'y1',
+                    },                     
+                    { 
+                        label: "Nível Estático", 
+                        data: dados.map((i: any) => i.nivel_estatico), 
+                        borderColor: '#ff6384', 
+                        borderWidth: 3,
+                        tension: 0.4, 
+                        yAxisID: 'y',
+                        order: 4
                     }
                 );
             } else if (tipoPiezometro === 'PR') {
@@ -283,7 +288,6 @@ export default function GraficoPiezometro() {
 
             setTabelaDados(dados);
 
-            // Configurar opções do gráfico
             const yAxisConfig: any = {
                 type: "linear",
                 display: true,
@@ -296,10 +300,9 @@ export default function GraficoPiezometro() {
                 }
             };
 
-            // Ajustar títulos dos eixos baseado no tipo
             if (ehPCouPV) {
                 // PC ou PV: apenas eixo direito com vazões e precipitação
-                yAxisConfig.display = false; // Esconde eixo esquerdo
+                yAxisConfig.display = false; 
                 
                 setLineOptions({
                     maintainAspectRatio: false,
@@ -397,13 +400,11 @@ export default function GraficoPiezometro() {
         }
     }
 
-    // Função para renderizar a tabela baseada no tipo
     const renderizarColunasTabela = () => {
         if (tabelaDados.length === 0 || !tipoSelecionado) return null;
 
         const ehPCouPV = eTipoCalhasOuPontoVazao(tipoSelecionado);
 
-        // Colunas comuns a todos os tipos
         let colunas = [
             <Column 
                 key="data"
@@ -417,7 +418,6 @@ export default function GraficoPiezometro() {
             />
         ];
 
-        // Adicionar colunas específicas de cada tipo
         if (tipoSelecionado === 'PP') {
             colunas.push(
                 <Column 
@@ -515,7 +515,6 @@ export default function GraficoPiezometro() {
 
     const renderizarCards = () => {
         if (!tipoSelecionado) {
-            // Estado inicial (sem dados)
             return (
                 <div className="grid mb-4">
                     <div className="col-12 md:col-6 lg:col-3">
