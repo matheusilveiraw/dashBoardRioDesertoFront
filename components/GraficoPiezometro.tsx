@@ -211,7 +211,9 @@ export default function GraficoPiezometro() {
                     { 
                         label: "Cota", 
                         data: dados.map((i: any) => i.cota_superficie), 
-                        borderColor: '#ff9f40', 
+                        borderColor: '#ff9f40',  //AQUI
+                        borderDash: [5, 5],
+                        pointRadius: 0,
                         tension: 0.4, 
                         yAxisID: 'y' 
                     },
