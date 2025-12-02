@@ -38,7 +38,6 @@ export default function GraficoPiezometro() {
     });
     const [tabelaDados, setTabelaDados] = useState<any[]>([]);
 
-    // Opções para o dropdown de filtro
     const opcoesFiltro = [
         { label: "Todos os Tipos", value: null },
         { label: "PP - Piezômetro de Profundidade", value: "PP" },
@@ -50,11 +49,9 @@ export default function GraficoPiezometro() {
     const carregarPiezometrosFiltrados = async (tipoFiltro: string | null = null) => {
         setCarregando(true);
         try {
-            // Se tipoFiltro for null, carrega todos. Senão, passa como array com um único elemento
             const filtroArray = tipoFiltro ? [tipoFiltro] : [];
             const resposta = await getPiezometrosAtivos(filtroArray);
             
-            // Filtrar piezômetros: excluir os do tipo "PB"
             const piezometrosFiltrados = resposta.data.filter((p: any) => p.tipoPiezometro !== "PB");
             
             const piezometrosFormatados = piezometrosFiltrados.map((p: any) => ({
@@ -91,17 +88,14 @@ export default function GraficoPiezometro() {
         }
     };
 
-    // Carregar inicialmente sem filtro (todos)
     useEffect(() => {
         carregarPiezometrosFiltrados(null);
     }, []);
 
-    // Recarregar quando o filtro de tipo mudar
     useEffect(() => {
         carregarPiezometrosFiltrados(tipoFiltroSelecionado);
     }, [tipoFiltroSelecionado]);
 
-    // Função auxiliar para verificar se é PC ou PV
     function eTipoCalhasOuPontoVazao(tipo: string): boolean {
         return tipo === 'PC' || tipo === 'PV';
     }
@@ -148,23 +142,13 @@ export default function GraficoPiezometro() {
                 });
             });
 
-            // Usar o tipoSelecionado diretamente
             const tipoPiezometro = tipoSelecionado;
             const ehPCouPV = eTipoCalhasOuPontoVazao(tipoPiezometro || '');
 
-            let datasets: any[] = [
-                { 
-                    label: "Precipitação", 
-                    data: dados.map((i: any) => i.precipitacao), 
-                    borderColor: '#2f4860', 
-                    tension: 0.4, 
-                    yAxisID: 'y1' 
-                }
-            ];
+            let datasets: any[] = [];
 
             if (tipoPiezometro === 'PP') {
-                datasets.push(
-                    // Cotas no fundo (ordem mais baixa)
+                datasets = [
                     {
                         label: "Cota Superfície",
                         data: dados.map((i: any) => i.cota_superficie),
@@ -189,7 +173,7 @@ export default function GraficoPiezometro() {
                         label: "Vazão Mina", 
                         data: dados.map((i: any) => i.vazao_bombeamento), 
                         borderColor: '#00bb7e', 
-                        borderWidth: 1, // Mais fina
+                        borderWidth: 1, 
                         tension: 0.4, 
                         yAxisID: 'y1',
                     },                     
@@ -201,11 +185,17 @@ export default function GraficoPiezometro() {
                         tension: 0.4, 
                         yAxisID: 'y',
                         order: 4
+                    },
+                    { 
+                        label: "Precipitação", 
+                        data: dados.map((i: any) => i.precipitacao), 
+                        borderColor: '#2f4860', 
+                        tension: 0.4, 
+                        yAxisID: 'y1' 
                     }
-                );
+                ];
             } else if (tipoPiezometro === 'PR') {
-                // PR: Cota, Nível Estático, Vazão Mina
-                datasets.push(
+                datasets = [
                     { 
                         label: "Vazão Mina", 
                         data: dados.map((i: any) => i.vazao_bombeamento), 
@@ -216,7 +206,7 @@ export default function GraficoPiezometro() {
                     { 
                         label: "Cota", 
                         data: dados.map((i: any) => i.cota_superficie), 
-                        borderColor: '#ff9f40',  //AQUI
+                        borderColor: '#ff9f40', 
                         borderDash: [5, 5],
                         pointRadius: 0,
                         tension: 0.4, 
@@ -228,26 +218,42 @@ export default function GraficoPiezometro() {
                         borderColor: '#ff6384', 
                         tension: 0.4, 
                         yAxisID: 'y' 
-                    }
-                );
-            } else if (ehPCouPV) {
-                // PC ou PV: Vazão (vazao_calha) e Vazão Mina (vazao_bombeamento)
-                datasets.push(
+                    },
                     { 
-                        label: "Vazão Mina", 
-                        data: dados.map((i: any) => i.vazao_bombeamento), 
-                        borderColor: '#00bb7e', 
+                        label: "Precipitação", 
+                        data: dados.map((i: any) => i.precipitacao), 
+                        borderColor: '#2f4860', 
                         tension: 0.4, 
                         yAxisID: 'y1' 
-                    },
+                    }
+                ];
+            } else if (ehPCouPV) {
+                datasets = [
                     { 
                         label: "Vazão", 
                         data: dados.map((i: any) => i.vazao_calha), 
                         borderColor: '#ff6384', 
+                        borderWidth: 3, 
+                        tension: 0.4, 
+                        yAxisID: 'y'  
+                    },
+                    { 
+                        label: "Vazão Mina", 
+                        data: dados.map((i: any) => i.vazao_bombeamento), 
+                        borderColor: '#00bb7e', 
+                        borderWidth: 1,
                         tension: 0.4, 
                         yAxisID: 'y1' 
+                    },
+                    { 
+                        label: "Precipitação", 
+                        data: dados.map((i: any) => i.precipitacao), 
+                        borderColor: '#2f4860', 
+                        borderWidth: 1,
+                        tension: 0.4, 
+                        yAxisID: 'y1'
                     }
-                );
+                ];
             }
 
             setLineData({
@@ -255,7 +261,6 @@ export default function GraficoPiezometro() {
                 datasets
             });
 
-            // Calcular médias baseadas no tipo
             const total = dados.length;
             const avgPrecip = total > 0 ? dados.reduce((acc: number, curr: any) => acc + (curr.precipitacao || 0), 0) / total : 0;
             const avgVazaoMina = total > 0 ? dados.reduce((acc: number, curr: any) => acc + (curr.vazao_bombeamento || 0), 0) / total : 0;
@@ -301,8 +306,15 @@ export default function GraficoPiezometro() {
             };
 
             if (ehPCouPV) {
-                // PC ou PV: apenas eixo direito com vazões e precipitação
-                yAxisConfig.display = false; 
+                yAxisConfig.title = {
+                    display: true,
+                    text: 'Vazão (m³/h)',
+                    color: '#ccc'
+                };
+
+                yAxisConfig.beginAtZero = true;
+                yAxisConfig.suggestedMin = 0;
+                yAxisConfig.min = 0;
                 
                 setLineOptions({
                     maintainAspectRatio: false,
@@ -336,14 +348,58 @@ export default function GraficoPiezometro() {
                             },
                             title: {
                                 display: true,
-                                text: 'Precipitação (mm) / Vazões (m³/h)',
+                                text: 'Vazão Mina (m³/h) / Precipitação (mm)',
                                 color: '#ccc'
                             }
                         }
                     }
                 });
-            } else {
-                // PP e PR: eixo esquerdo para nível/cota, direito para precipitação/vazão
+            } else if (tipoPiezometro === 'PR') {
+                yAxisConfig.title = {
+                    display: true,
+                    text: 'Cota/Nível (m)',
+                    color: '#ccc'
+                };
+                
+                setLineOptions({
+                    maintainAspectRatio: false,
+                    aspectRatio: 0.6,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ccc'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#ccc'
+                            },
+                            grid: {
+                                color: '#444'
+                            }
+                        },
+                        y: yAxisConfig,
+                        y1: {
+                            type: "linear",
+                            display: true,
+                            position: "right",
+                            ticks: {
+                                color: "#ccc"
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Precipitação (mm) / Vazão Mina (m³/h)',
+                                color: '#ccc'
+                            }
+                        }
+                    }
+                });
+            } else if (tipoPiezometro === 'PP') {
                 yAxisConfig.title = {
                     display: true,
                     text: 'Nível/Cota (m)',
