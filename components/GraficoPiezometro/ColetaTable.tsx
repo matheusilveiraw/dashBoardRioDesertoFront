@@ -78,11 +78,6 @@ export default function ColetaTable({
                     header="IDENTIFICAÇÃO" 
                     sortable 
                 />
-                <Column 
-                    field="total_registros" 
-                    header="TOTAL REGISTROS" 
-                    sortable 
-                />
             </DataTable>
         </div>
     );
