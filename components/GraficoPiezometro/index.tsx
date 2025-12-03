@@ -5,6 +5,8 @@
 import { Chart } from "primereact/chart";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import ColetaTable from "./ColetaTable";
+
 
 import { usePiezometroData } from "@/hooks/usePiezometroData";
 import FilterBar from "./FilterBar";
@@ -22,7 +24,12 @@ export default function GraficoPiezometro() {
         
         updateFilters,
         handleSelecionarPiezometro,
-        buscarGrafico
+        buscarGrafico,
+
+        // relacionados as dados das coletas
+        coletaDados,
+        expandedRows,
+        setExpandedRows,
     } = usePiezometroData();
 
     // Funções auxiliares (mantidas do código original)
@@ -330,7 +337,6 @@ export default function GraficoPiezometro() {
 
             {/* CARDS DINÂMICOS */}
             
-            
             {/* 
             {renderizarCards()}
                 */}
@@ -355,7 +361,7 @@ export default function GraficoPiezometro() {
                 )}
             </div>
 
-            {/* TABELA DE DADOS */}
+            {/* LISTA DOS DADOS DA TABELA */}
             {tabelaDados.length > 0 && filters.tipoSelecionado && (
                 <div className="card">
                     <h5 className="mb-4 text-white">
@@ -365,6 +371,15 @@ export default function GraficoPiezometro() {
                         {renderizarColunasTabela()}
                     </DataTable>
                 </div>
+            )}
+
+            {/* TABELA DE COLETA */}
+            {coletaDados && coletaDados.length > 0 && ( 
+                <ColetaTable 
+                    data={coletaDados}
+                    expandedRows={expandedRows}
+                    onRowToggle={(e) => setExpandedRows(e.data)}
+                />
             )}
         </div>
     );

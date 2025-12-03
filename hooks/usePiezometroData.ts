@@ -81,6 +81,8 @@ export const usePiezometroData = () => {
         total: 0
     });
     const [tabelaDados, setTabelaDados] = useState<TabelaDado[]>([]);
+    const [coletaDados, setColetaDados] = useState<any[]>([]); // ← NOVO
+    const [expandedRows, setExpandedRows] = useState<any>(null); // ← NOVO
 
     // Opções de filtro (constante)
     const opcoesFiltro = [
@@ -182,7 +184,7 @@ export const usePiezometroData = () => {
                 fimFormatado
             );
 
-            console.log('Resposta Coleta:', respostaColeta.data);
+            setColetaDados(respostaColeta.data || []);
 
             let dados = [...resposta.data].sort((a: any, b: any) => {
                 return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
@@ -533,6 +535,11 @@ export const usePiezometroData = () => {
         // Funções
         updateFilters,
         handleSelecionarPiezometro,
-        buscarGrafico
+        buscarGrafico,
+
+        //relacionados as dados das coletas
+        coletaDados,        
+        expandedRows,       
+        setExpandedRows,
     };
 };
