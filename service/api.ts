@@ -30,3 +30,7 @@ export const getColetaPorIdDataInicioDataFimApi = (id: number, inicio: string, f
         }
     });
 };
+
+export const getAnaliseQuimicaPorRegistro = (nRegistro: number) => {
+    return rota.get(`/relatorios/coleta/analises-quimicas/${nRegistro}`);
+};

@@ -1,29 +1,49 @@
-//componente do tabela de coletas detalhadas no piezômetro
-
+// Em: src/components/GraficoPiezometro/ColetaTable.tsx
 'use client';
 
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import AnaliseQuimica from './AnaliseQuimica';
 
 interface ColetaTableProps {
     data: any[];
     expandedRows: any;
     onRowToggle: (e: any) => void;
+    analisesQuimicas: Record<number, any>;       
+    carregandoAnalise: Record<number, boolean>;  
+    buscarAnaliseQuimica: (nRegistro: number) => void; 
 }
 
-export default function ColetaTable({ data, expandedRows, onRowToggle }: ColetaTableProps) {
+export default function ColetaTable({ 
+    data, 
+    expandedRows, 
+    onRowToggle,
+    analisesQuimicas,
+    carregandoAnalise,
+    buscarAnaliseQuimica 
+}: ColetaTableProps) {
+    
     const formatarData = (dataString: string) => {
         const [ano, mes, dia] = dataString.split('-');
         return `${dia}/${mes}/${ano}`;
     };
 
     const rowExpansionTemplate = (rowData: any) => {
+        const nRegistro = rowData.n_registro;
+        const analise = analisesQuimicas[nRegistro];
+        const carregando = carregandoAnalise[nRegistro] || false;
+        
         return (
-            <div className="p-3">
-                <p>Detalhes para o registro {rowData.n_registro}</p>
-                {/* dados vão vir aqui */}
-            </div>
+            <AnaliseQuimica 
+                data={analise}
+                carregando={carregando}
+            />
         );
+    };
+
+    const onRowExpand = (event: any) => {
+        const nRegistro = event.data.n_registro;
+        buscarAnaliseQuimica(nRegistro);
     };
 
     return (
@@ -33,10 +53,13 @@ export default function ColetaTable({ data, expandedRows, onRowToggle }: ColetaT
                 value={data}
                 expandedRows={expandedRows}
                 onRowToggle={onRowToggle}
+                onRowExpand={onRowExpand}
                 rowExpansionTemplate={rowExpansionTemplate}
                 dataKey="n_registro"
                 className="p-datatable-sm"
                 emptyMessage="Nenhum registro de coleta encontrado"
+                paginator
+                rows={10}
             >
                 <Column expander style={{ width: '3rem' }} />
                 <Column 
@@ -53,6 +76,11 @@ export default function ColetaTable({ data, expandedRows, onRowToggle }: ColetaT
                 <Column 
                     field="identificacao" 
                     header="IDENTIFICAÇÃO" 
+                    sortable 
+                />
+                <Column 
+                    field="total_registros" 
+                    header="TOTAL REGISTROS" 
                     sortable 
                 />
             </DataTable>

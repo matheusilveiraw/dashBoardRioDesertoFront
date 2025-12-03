@@ -4,7 +4,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
-import { getPiezometrosAtivos, getPiezometroPorIdDataInicioDataFimApi, getColetaPorIdDataInicioDataFimApi } from "@/service/api";
+import { 
+    getPiezometrosAtivos, 
+    getPiezometroPorIdDataInicioDataFimApi, 
+    getColetaPorIdDataInicioDataFimApi, 
+    getAnaliseQuimicaPorRegistro 
+} from "@/service/api";
 import { formatarData } from "@/utils/formatarData";
 
 interface PiezometroOption {
@@ -80,9 +85,16 @@ export const usePiezometroData = () => {
         vazao: 0,
         total: 0
     });
+
+    //da tabela de coletas
     const [tabelaDados, setTabelaDados] = useState<TabelaDado[]>([]);
-    const [coletaDados, setColetaDados] = useState<any[]>([]); // ← NOVO
-    const [expandedRows, setExpandedRows] = useState<any>(null); // ← NOVO
+    const [coletaDados, setColetaDados] = useState<any[]>([]); 
+    const [expandedRows, setExpandedRows] = useState<any>(null); 
+
+    //das analises dentro de coletas
+    const [analisesQuimicas, setAnalisesQuimicas] = useState<Record<number, any>>({});
+    const [carregandoAnalise, setCarregandoAnalise] = useState<Record<number, boolean>>({});
+
 
     // Opções de filtro (constante)
     const opcoesFiltro = [
@@ -512,6 +524,25 @@ export const usePiezometroData = () => {
         }
     }, [filters]);
 
+    const buscarAnaliseQuimica = useCallback(async (nRegistro: number) => {
+    if (analisesQuimicas[nRegistro]) return;
+    
+    setCarregandoAnalise(prev => ({ ...prev, [nRegistro]: true }));
+    
+    try {
+        const resposta = await getAnaliseQuimicaPorRegistro(nRegistro);
+        setAnalisesQuimicas(prev => ({
+            ...prev,
+            [nRegistro]: resposta.data
+        }));
+    } catch (error) {
+        console.error(`Erro ao buscar análise do registro ${nRegistro}:`, error);
+    } finally {
+        setCarregandoAnalise(prev => ({ ...prev, [nRegistro]: false }));
+    }
+}, [analisesQuimicas]);
+
+
     // Efeitos
     useEffect(() => {
         carregarPiezometrosFiltrados(null);
@@ -541,5 +572,10 @@ export const usePiezometroData = () => {
         coletaDados,        
         expandedRows,       
         setExpandedRows,
+
+        //relacionados as analises quimicas dentro de coletas
+        analisesQuimicas,        
+        carregandoAnalise,       
+        buscarAnaliseQuimica,
     };
 };

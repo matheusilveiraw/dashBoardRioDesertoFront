@@ -30,6 +30,11 @@ export default function GraficoPiezometro() {
         coletaDados,
         expandedRows,
         setExpandedRows,
+
+        //relacionados as analises quimicas dentro de coletas
+        analisesQuimicas,        
+        carregandoAnalise,       
+        buscarAnaliseQuimica,
     } = usePiezometroData();
 
     // Funções auxiliares (mantidas do código original)
@@ -367,18 +372,22 @@ export default function GraficoPiezometro() {
                     <h5 className="mb-4 text-white">
                         Painel de Dados - {filters.tipoSelecionado}
                     </h5>
-                    <DataTable value={tabelaDados} paginator rows={5} className="p-datatable-sm" emptyMessage="Nenhum dado encontrado">
+                    <DataTable value={tabelaDados} paginator rows={10} className="p-datatable-sm" emptyMessage="Nenhum dado encontrado">
                         {renderizarColunasTabela()}
                     </DataTable>
                 </div>
             )}
 
             {/* TABELA DE COLETA */}
+
             {coletaDados && coletaDados.length > 0 && ( 
                 <ColetaTable 
                     data={coletaDados}
                     expandedRows={expandedRows}
                     onRowToggle={(e) => setExpandedRows(e.data)}
+                    analisesQuimicas={analisesQuimicas}
+                    carregandoAnalise={carregandoAnalise}
+                    buscarAnaliseQuimica={buscarAnaliseQuimica}
                 />
             )}
         </div>
