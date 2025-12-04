@@ -3,6 +3,8 @@
 import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import { Badge } from "primereact/badge";
+import { useState } from "react";
+import { Accordion, AccordionTab } from "primereact/accordion";
 
 interface AnaliseQuimicaProps {
   data: any;
@@ -23,8 +25,10 @@ interface ParametroPortaria {
 export default function AnaliseQuimica(
   { data, carregando }: AnaliseQuimicaProps
 ) {
+  const [expanded, setExpanded] = useState(false);
+
   // valores da portaria conforme o anexo que o pessoal do meo ambiente passou
-  const parametrosPortaria: Record = {
+  const parametrosPortaria: Record<string, ParametroPortaria> = {
     pH: {
       nome: "pH",
       limite: "6,0 a 9,0",
@@ -216,18 +220,7 @@ export default function AnaliseQuimica(
     );
   }
 
-  const { informacoesAmostra, totalParametros, analises } = data;
-
-  const mapeamentoReverso: Record = {
-    pH: "pH",
-    sulfato: "sulfato",
-    ferroTotal: "ferroTotal",
-    manganesTotal: "manganesTotal",
-    durezaTotal: "durezaTotal",
-    coliformesTotais: "coliformesTotais",
-    turbidez: "turbidez",
-    cor: "cor",
-  };
+  const { informacoesAmostra, totalParametrosMapeados, totalOutrosDados, analises, outrosDados } = data;
 
   return (
     <div className="p-3">
@@ -252,8 +245,12 @@ export default function AnaliseQuimica(
             </span>
           </div>
           <div className="col-6">
-            <span className="text-500">Total de Parâmetros: </span>
-            <span className="font-medium">{totalParametros}</span>
+            <span className="text-500">Parâmetros Mapeados: </span>
+            <span className="font-medium">{totalParametrosMapeados}</span>
+          </div>
+          <div className="col-6">
+            <span className="text-500">Outros Dados: </span>
+            <span className="font-medium">{totalOutrosDados}</span>
           </div>
           <div className="col-12">
             <span className="text-500">Nome: </span>
@@ -339,6 +336,38 @@ export default function AnaliseQuimica(
           })}
         </div>
       </div>
+
+      {/* tab das outras análises */}
+      {totalOutrosDados > 0 && (
+        <div className="mb-4">
+          <Accordion activeIndex={expanded ? 0 : null} onTabChange={(e) => setExpanded(e.index === 0)}>
+            <AccordionTab 
+              header={
+                <div className="flex align-items-center gap-2">
+                  <i className="pi pi-chart-bar"></i>
+                  <span>Outras Análises Disponíveis</span>
+                  <Badge value={totalOutrosDados} severity="info" className="ml-2" />
+                </div>
+              }
+            >
+              <div className="grid">
+                {Object.entries(outrosDados || {}).map(([simbolo, resultado]) => (
+                  <div key={simbolo} className="col-12 md:col-6 lg:col-3 mb-2">
+                    <div className="bg-gray-900 border-1 border-gray-700 p-2 border-round">
+                      <div className="text-gray-400 text-xs font-medium mb-1">
+                        {simbolo}
+                      </div>
+                      <div className="text-white text-sm">
+                        {resultado as string}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </AccordionTab>
+          </Accordion>
+        </div>
+      )}
     </div>
   );
 }
