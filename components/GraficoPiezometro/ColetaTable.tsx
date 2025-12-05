@@ -9,8 +9,8 @@ interface ColetaTableProps {
   data: any[];
   expandedRows: any;
   onRowToggle: (e: any) => void;
-  analisesQuimicas: Record;
-  carregandoAnalise: Record;
+  analisesQuimicas: Record<number, any>;
+  carregandoAnalise: Record<number, boolean>;
   buscarAnaliseQuimica: (nRegistro: number) => void;
 }
 
@@ -58,7 +58,7 @@ export default function ColetaTable(
         rows={10}
       >
         <Column expander style={{ width: "3rem" }} />
-        <Column field="n_registro" header="Nº REGISTRO" sortable />
+        <Column field="n_registro" header="Nº REGISTRO" sortable  />
         <Column
           field="data"
           header="DATA"
@@ -69,8 +69,6 @@ export default function ColetaTable(
           field="identificacao" 
           header="IDENTIFICAÇÃO" 
           sortable 
-          className="hidden md:table-cell"
-          headerClassName="hidden md:table-cell"
         />
       </DataTable>
     </div>
