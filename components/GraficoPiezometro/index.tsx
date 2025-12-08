@@ -202,12 +202,6 @@ export default function GraficoPiezometro() {
         onBuscar={buscarGrafico}
       />
 
-      {/* CARDS DINÂMICOS */}
-
-      {/* 
-            {renderizarCards()}
-                */}
-
       {/* GRÁFICO */}
       <div className="chart-container">
         <div className="chart-header">
