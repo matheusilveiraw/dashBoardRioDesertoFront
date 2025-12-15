@@ -1,3 +1,4 @@
 {
-  "/(main)/pages/qualidade-agua/page": "app/(main)/pages/qualidade-agua/page.js"
+  "/relatorios-scrap/qualidade/page": "app/relatorios-scrap/qualidade/page.js",
+  "/relatorios-scrap/nivel/page": "app/relatorios-scrap/nivel/page.js"
 }

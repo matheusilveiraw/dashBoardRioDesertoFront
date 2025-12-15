@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/(main)/pages/qualidade-agua/page": [
+    "/relatorios-scrap/nivel/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/pages/qualidade-agua/page.js"
+      "static/chunks/app/relatorios-scrap/nivel/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,11 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/(main)/layout": [
+    "/relatorios-scrap/qualidade/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(main)/layout.css",
-      "static/chunks/app/(main)/layout.js"
+      "static/chunks/app/relatorios-scrap/qualidade/page.js"
     ]
   }
 }
