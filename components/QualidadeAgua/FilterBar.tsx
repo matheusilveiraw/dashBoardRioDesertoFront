@@ -74,7 +74,7 @@ export default function FilterBar({
                 <div className="flex gap-2">
                     <Calendar
                         value={dataInicio}
-                        onChange={(e) => onDataInicioChange(e.value)}
+                        onChange={(e:any) => onDataInicioChange(e.value)}
                         dateFormat="mm/yy"
                         view="month"
                         placeholder="Início"
@@ -84,7 +84,7 @@ export default function FilterBar({
                     />
                     <Calendar
                         value={dataFim}
-                        onChange={(e) => onDataFimChange(e.value)}
+                        onChange={(e:any) => onDataFimChange(e.value)}
                         dateFormat="mm/yy"
                         view="month"
                         placeholder="Fim"

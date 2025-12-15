@@ -22,7 +22,7 @@ export const getPiezometrosRelatorio = () => {
 };
 
 // Dados de nível estático (GraficoPiezometro)
-export const getPiezometroPorIdDataInicioDataFimApi = (id: number, inicio: string, fim: string) => {
+export const getPiezometroPorIdDataInicioDataFimApi = (id: number | string | null, inicio: string, fim: string) => {
     return rota.get(`/relatorios/piezometro/${id}/filtro`, {
         params: {
             mesAnoInicio: inicio,

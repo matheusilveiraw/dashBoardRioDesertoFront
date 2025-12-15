@@ -4,6 +4,7 @@ import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import GraficoPiezometro from '@/components/GraficoPiezometro';
 
+
 export default function Page() {
   const searchParams = useSearchParams();
   const cdPiezometro = searchParams.get('cdPiezometro');
@@ -17,10 +18,10 @@ export default function Page() {
   return (
     <div style={{ padding: 24 }}>
       <GraficoPiezometro
-        initialCdPiezometro={Number(cdPiezometro)}
+        initialCdPiezometro={cdPiezometro}
         initialMesAnoInicio={mesAnoInicio}
         initialMesAnoFim={mesAnoFim}
-        autoApply
+        autoApply={true as any}
       />
     </div>
   );
