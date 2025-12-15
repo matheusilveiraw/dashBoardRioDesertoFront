@@ -294,7 +294,7 @@ export default function GraficosAnalise({ dados }: PropriedadesGrafico) {
                 </div>
             )}
 
-            <div className="grid">
+            <div id="analises-scrap" className="grid">
                 {charts.map((grafico, index) => (
                     <div key={index} className="col-12 md:col-6 lg:col-6">
                         <div className="chart-container h-full surface-card p-3 shadow-2 border-round">

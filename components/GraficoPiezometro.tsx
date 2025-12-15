@@ -781,7 +781,7 @@ export default function GraficoPiezometro({
       {/* Removido conforme solicitado */}
 
       {/*GŔAFICO*/}
-      <div className="chart-container">
+      <div id="nivel-estatico-scrap" className="chart-container">
         <div className="chart-header">
           <div className="chart-title">
             {tabelaDados.length > 0 && tipoSelecionado
