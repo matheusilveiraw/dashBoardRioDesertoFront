@@ -1,3 +1,3 @@
 {
-  "/(main)/page": "app/(main)/page.js"
+  "/(main)/pages/qualidade-agua/page": "app/(main)/pages/qualidade-agua/page.js"
 }

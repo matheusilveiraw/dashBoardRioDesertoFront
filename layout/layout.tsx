@@ -6,13 +6,14 @@ import { useEventListener, useMountEffect, useUnmountEffect } from 'primereact/h
 import React, { useContext, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
 import AppFooter from './AppFooter';
-import AppSidebar from './AppSidebar';
+
 import AppTopbar from './AppTopbar';
 
 import { LayoutContext } from './context/layoutcontext';
 import { PrimeReactContext } from 'primereact/api';
 import { ChildContainerProps, LayoutState, AppTopbarRef } from '@/types';
 import { usePathname, useSearchParams } from 'next/navigation';
+import AppMenu from './AppMenu';
 
 const Layout = ({ children }: ChildContainerProps) => {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);
@@ -126,9 +127,11 @@ const Layout = ({ children }: ChildContainerProps) => {
         <React.Fragment>
             <div className={containerClass}>
                 <AppTopbar ref={topbarRef} />
-                {/* <div ref={sidebarRef} className="layout-sidebar">
-                    <AppSidebar />
-                </div> */ }
+
+                <div ref={sidebarRef}>
+                    <AppMenu />
+                </div>
+
                 <div className="layout-main-container">
                     <div className="layout-main">{children}</div>
                     {/*<AppFooter /> */}

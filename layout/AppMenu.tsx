@@ -1,189 +1,212 @@
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useContext } from 'react';
-import AppMenuitem from './AppMenuitem';
-import { LayoutContext } from './context/layoutcontext';
-import { MenuProvider } from './context/menucontext';
-import Link from 'next/link';
-import { AppMenuItem } from '@/types';
+import React, { useContext, useState, useEffect } from "react";
+import AppMenuitem from "./AppMenuitem";
+import { LayoutContext } from "./context/layoutcontext";
+import { MenuProvider } from "./context/menucontext";
+import { AppMenuItem } from "@/types";
+import { Button } from "primereact/button";
+import { Sidebar } from "primereact/sidebar";
+import classNames from "classnames";
+import "primeicons/primeicons.css";
 
 const AppMenu = () => {
-    const { layoutConfig } = useContext(LayoutContext);
+  const { layoutConfig, layoutState, setLayoutState } =
+    useContext(LayoutContext);
+  const [visible, setVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-    const model: AppMenuItem[] = [
-        {
-            label: 'Home',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
-        },
-        {
-            label: 'UI Components',
-            items: [
-                { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
-                { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-                { label: 'Float Label', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
-                { label: 'Invalid State', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
-                { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-                { label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-                { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
-                { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-                { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-                { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-                { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-                { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu', preventExact: true },
-                { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-                { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-                { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-                { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' }
-            ]
-        },
-        {
-            label: 'Prime Blocks',
-            items: [
-                { label: 'Free Blocks', icon: 'pi pi-fw pi-eye', to: '/blocks', badge: 'NEW' },
-                { label: 'All Blocks', icon: 'pi pi-fw pi-globe', url: 'https://blocks.primereact.org', target: '_blank' }
-            ]
-        },
-        {
-            label: 'Utilities',
-            items: [
-                { label: 'PrimeIcons', icon: 'pi pi-fw pi-prime', to: '/utilities/icons' },
-                { label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://primeflex.org/', target: '_blank' }
-            ]
-        },
-        {
-            label: 'Pages',
-            icon: 'pi pi-fw pi-briefcase',
-            to: '/pages',
-            items: [
-                {
-                    label: 'Landing',
-                    icon: 'pi pi-fw pi-globe',
-                    to: '/landing'
-                },
-                {
-                    label: 'Auth',
-                    icon: 'pi pi-fw pi-user',
-                    items: [
-                        {
-                            label: 'Login',
-                            icon: 'pi pi-fw pi-sign-in',
-                            to: '/auth/login'
-                        },
-                        {
-                            label: 'Error',
-                            icon: 'pi pi-fw pi-times-circle',
-                            to: '/auth/error'
-                        },
-                        {
-                            label: 'Access Denied',
-                            icon: 'pi pi-fw pi-lock',
-                            to: '/auth/access'
-                        }
-                    ]
-                },
-                {
-                    label: 'Crud',
-                    icon: 'pi pi-fw pi-pencil',
-                    to: '/pages/crud'
-                },
-                {
-                    label: 'Timeline',
-                    icon: 'pi pi-fw pi-calendar',
-                    to: '/pages/timeline'
-                },
-                {
-                    label: 'Not Found',
-                    icon: 'pi pi-fw pi-exclamation-circle',
-                    to: '/pages/notfound'
-                },
-                {
-                    label: 'Empty',
-                    icon: 'pi pi-fw pi-circle-off',
-                    to: '/pages/empty'
-                }
-            ]
-        },
-        {
-            label: 'Hierarchy',
-            items: [
-                {
-                    label: 'Submenu 1',
-                    icon: 'pi pi-fw pi-bookmark',
-                    items: [
-                        {
-                            label: 'Submenu 1.1',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' }
-                            ]
-                        },
-                        {
-                            label: 'Submenu 1.2',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                        }
-                    ]
-                },
-                {
-                    label: 'Submenu 2',
-                    icon: 'pi pi-fw pi-bookmark',
-                    items: [
-                        {
-                            label: 'Submenu 2.1',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [
-                                { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                                { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' }
-                            ]
-                        },
-                        {
-                            label: 'Submenu 2.2',
-                            icon: 'pi pi-fw pi-bookmark',
-                            items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            label: 'Get Started',
-            items: [
-                {
-                    label: 'Documentation',
-                    icon: 'pi pi-fw pi-question',
-                    to: '/documentation'
-                },
-                {
-                    label: 'Figma',
-                    url: 'https://www.dropbox.com/scl/fi/bhfwymnk8wu0g5530ceas/sakai-2023.fig?rlkey=u0c8n6xgn44db9t4zkd1brr3l&dl=0',
-                    icon: 'pi pi-fw pi-pencil',
-                    target: '_blank'
-                },
-                {
-                    label: 'View Source',
-                    icon: 'pi pi-fw pi-search',
-                    url: 'https://github.com/primefaces/sakai-react',
-                    target: '_blank'
-                }
-            ]
-        }
-    ];
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-    return (
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  const model: AppMenuItem[] = [
+    {
+      label: "Telas",
+      items: [
+        {
+          label: "Nível Estático, Precipitação e Vazão",
+          to: "/",
+          icon: "pi pi-fw pi-chart-line",
+        },
+        {
+          label: "Qualiadade da Água",
+          to: "pages/qualidade-agua",
+          icon: "pi pi-fw pi-chart-line",
+        },
+      ],
+    },
+  ];
+
+
+  const toggleSidebar = () => {
+    setVisible(!visible);
+  };
+
+  // Configurações do Sidebar
+  const sidebarProps = isMobile
+    ? {
+      modal: true,
+      dismissable: true,
+      showCloseIcon: true,
+      blockScroll: true,
+      position: "left",
+      style: { width: "85%" },
+    }
+    : {
+      modal: false,
+      dismissable: false,
+      showCloseIcon: false,
+      blockScroll: false,
+      position: "left",
+      style: { width: "16rem" },
+    };
+
+  return (
+    <>
+      {!visible && (
+        <Button
+          icon="pi pi-bars"
+          className="p-button-rounded p-button-primary sidebar-toggle-btn"
+          onClick={toggleSidebar}
+          style={{
+            position: "fixed",
+            bottom: "2rem",
+            left: "1rem",
+            zIndex: 1000,
+            width: "3.5rem",
+            height: "3.5rem",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            animation: "fadeIn 0.3s ease",
+          }}
+        />
+      )}
+
+      <Sidebar
+        visible={visible}
+        onHide={() => setVisible(false)}
+        className={classNames("app-sidebar", { "mobile-sidebar": isMobile })}
+        {...sidebarProps}
+      >
+        <div className="sidebar-header">
+          <div className="flex align-items-center gap-2">
+            <h2 className="m-0 text-900">Menu</h2>
+          </div>
+
+          {isMobile && (
+            <Button
+              icon="pi pi-times"
+              className="p-button-rounded p-button-text p-button-plain"
+              onClick={() => setVisible(false)}
+            />
+          )}
+        </div>
+
         <MenuProvider>
-            <ul className="layout-menu">
-                {model.map((item, i) => {
-                    return !item?.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator"></li>;
-                })}
-
-                <Link href="https://blocks.primereact.org" target="_blank" style={{ cursor: 'pointer' }}>
-                    <img alt="Prime Blocks" className="w-full mt-3" src={`/layout/images/banner-primeblocks${layoutConfig.colorScheme === 'light' ? '' : '-dark'}.png`} />
-                </Link>
-            </ul>
+          <ul className="layout-menu list-none p-0 m-0">
+            {model.map((item, i) => {
+              return !item?.seperator ? (
+                <AppMenuitem
+                  item={item}
+                  root={true}
+                  index={i}
+                  key={item.label}
+                />
+              ) : (
+                <li className="menu-separator" key={`separator-${i}`}></li>
+              );
+            })}
+          </ul>
         </MenuProvider>
-    );
+
+        <div className="sidebar-footer">
+          <Button
+            label="Fechar Menu"
+            icon="pi pi-chevron-left"
+            className="p-button-outlined p-button-secondary"
+            onClick={() => setVisible(false)}
+            style={{ width: "100%" }}
+          />
+        </div>
+      </Sidebar>
+
+      <style jsx>{`
+        /* Estilos para o sidebar */
+        :global(.app-sidebar) {
+          padding: 1rem;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+          background: var(--surface-card);
+          border-right: 1px solid var(--surface-border);
+          display: flex;
+          flex-direction: column;
+        }
+
+        :global(.app-sidebar .p-sidebar-content) {
+          padding: 0;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+
+        :global(.app-sidebar .sidebar-header) {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-bottom: 1rem;
+          margin-bottom: 1rem;
+          border-bottom: 1px solid var(--surface-border);
+          flex-shrink: 0;
+        }
+
+        :global(.app-sidebar .layout-menu) {
+          flex: 1;
+          overflow-y: auto;
+          padding-right: 0.5rem;
+        }
+
+        :global(.app-sidebar .sidebar-footer) {
+          padding-top: 1rem;
+          border-top: 1px solid var(--surface-border);
+          flex-shrink: 0;
+        }
+
+        :global(.mobile-sidebar) {
+          width: 85% !important;
+        }
+
+        /* Botão flutuante no final */
+        :global(.sidebar-toggle-btn) {
+          transition: all 0.3s ease;
+        }
+
+        :global(.sidebar-toggle-btn:hover) {
+          transform: scale(1.1);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Animação para o botão de toggle */
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+    </>
+  );
 };
 
 export default AppMenu;

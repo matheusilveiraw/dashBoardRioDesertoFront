@@ -8,6 +8,7 @@ import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
 import '../styles/rio-deserto.scss';
 
+
 interface RootLayoutProps {
     children: React.ReactNode;
 }
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </head>
             <body>
                 <PrimeReactProvider>
-                    <LayoutProvider>{children}</LayoutProvider>
+                    <LayoutProvider>
+                        {children}
+                    </LayoutProvider>
                 </PrimeReactProvider>
             </body>
         </html>
