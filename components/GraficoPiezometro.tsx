@@ -18,7 +18,19 @@ import {
 } from "@/service/api";
 import { formatarData } from "@/utils/formatarData";
 
-export default function GraficoPiezometro() {
+type GraficoPiezometroProps = { //SCRAP
+  initialCdPiezometro?: number;
+  initialMesAnoInicio?: string;
+  initialMesAnoFim?: string;    
+  autoApply?: boolean;         
+};
+
+export default function GraficoPiezometro({
+  initialCdPiezometro,
+  initialMesAnoInicio,
+  initialMesAnoFim,
+  autoApply = false, // SCRAP OFF
+}: GraficoPiezometroProps) { 
   const [piezometros, setPiezometros] = useState([]);
   const [idSelecionado, setIdSelecionado] = useState<number | null>(null);
   const [tipoSelecionado, setTipoSelecionado] = useState<string | null>(null);
@@ -30,6 +42,7 @@ export default function GraficoPiezometro() {
 
   const [dataInicio, setDataInicio] = useState<Date | null>(null);
   const [dataFim, setDataFim] = useState<Date | null>(null);
+  const [autoApplied, setAutoApplied] = useState(false); //SCRAP
 
   const [lineData, setLineData] = useState<any>(null);
   const [lineOptions, setLineOptions] = useState<any>({});
@@ -106,6 +119,46 @@ export default function GraficoPiezometro() {
   useEffect(() => {
     carregarPiezometrosFiltrados(null);
   }, []);
+
+  // Parse helper para mm/YYYY -> Date
+  const parseMesAno = (mesAno: string | undefined | null): Date | null => {
+    if (!mesAno) return null;
+    const m = mesAno.match(/^(0[1-9]|1[0-2])\/(19|20)\d{2}$/);
+    if (!m) return null;
+    const [mm, yyyy] = mesAno.split('/');
+    const month = parseInt(mm, 10) - 1;
+    const year = parseInt(yyyy, 10);
+    return new Date(year, month, 1);
+  };
+
+  // Quando filtros iniciais são fornecidos via props, aplicamos nos estados
+  useEffect(() => {
+    if (initialCdPiezometro) {
+      setIdSelecionado(initialCdPiezometro);
+    }
+    const di = parseMesAno(initialMesAnoInicio);
+    const df = parseMesAno(initialMesAnoFim);
+    if (di) setDataInicio(di);
+    if (df) setDataFim(df);
+  }, [initialCdPiezometro, initialMesAnoInicio, initialMesAnoFim]);
+
+  // Quando a lista de piezômetros carrega/atualiza, ajusta o tipo do selecionado
+  useEffect(() => {
+    if (!idSelecionado) return;
+    const piezometroSelecionado = piezometros.find((p: any) => p.value === idSelecionado);
+    if (piezometroSelecionado) {
+      setTipoSelecionado(piezometroSelecionado.tipo);
+    }
+  }, [piezometros, idSelecionado]);
+
+  // Auto aplicar a busca quando todos os filtros iniciais estiverem presentes
+  useEffect(() => {
+    if (!autoApply || autoApplied) return;
+    if (idSelecionado && dataInicio && dataFim && tipoSelecionado) {
+      buscarGrafico();
+      setAutoApplied(true);
+    }
+  }, [autoApply, autoApplied, idSelecionado, dataInicio, dataFim, tipoSelecionado]);
 
   useEffect(() => {
     carregarPiezometrosFiltrados(tipoFiltroSelecionado);
@@ -635,239 +688,6 @@ export default function GraficoPiezometro() {
   };
 
   const renderizarCards = () => {
-    if (!tipoSelecionado) {
-      return (
-        <div className="grid mb-4">
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                NÍVEL ESTÁTICO MÉDIO{" "}
-                <i className="pi pi-chart-line text-yellow-500" />
-              </div>
-              <div className="summary-value">
-                {summary.nivelEstatico}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                PRECIPITAÇÃO MÉDIA <i className="pi pi-cloud text-blue-500" />
-              </div>
-              <div className="summary-value">
-                {summary.precipitacao}
-                <span className="summary-unit">mm</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                VAZÃO MINA MÉDIA{" "}
-                <i className="pi pi-sliders-h text-orange-500" />
-              </div>
-              <div className="summary-value">
-                {summary.vazaoMina}
-                <span className="summary-unit">m³/h</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                TOTAL DE MEDIÇÕES <i className="pi pi-file text-green-500" />
-              </div>
-              <div className="summary-value">
-                {summary.total}
-                <span className="summary-unit">reg</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    const ehPCouPV = eTipoCalhasOuPontoVazao(tipoSelecionado);
-
-    if (ehPCouPV) {
-      return (
-        <div className="grid mb-4">
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                VAZÃO MÉDIA <i className="pi pi-water text-yellow-500" />
-              </div>
-              <div className="summary-value">
-                {summary.vazao}
-                <span className="summary-unit">m³/h</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                VAZÃO MINA MÉDIA{" "}
-                <i className="pi pi-sliders-h text-orange-500" />
-              </div>
-              <div className="summary-value">
-                {summary.vazaoMina}
-                <span className="summary-unit">m³/h</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                PRECIPITAÇÃO MÉDIA <i className="pi pi-cloud text-blue-500" />
-              </div>
-              <div className="summary-value">
-                {summary.precipitacao}
-                <span className="summary-unit">mm</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                TOTAL DE MEDIÇÕES <i className="pi pi-file text-green-500" />
-              </div>
-              <div className="summary-value">
-                {summary.total}
-                <span className="summary-unit">reg</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    } else if (tipoSelecionado === "PR") {
-      return (
-        <div className="grid mb-4">
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                COTA MÉDIA <i className="pi pi-chart-line text-yellow-500" />
-              </div>
-              <div className="summary-value">
-                {summary.cotaSuperficie}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                NÍVEL ESTÁTICO MÉDIO{" "}
-                <i className="pi pi-chart-bar text-purple-500" />
-              </div>
-              <div className="summary-value">
-                {summary.nivelEstatico}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                PRECIPITAÇÃO MÉDIA <i className="pi pi-cloud text-blue-500" />
-              </div>
-              <div className="summary-value">
-                {summary.precipitacao}
-                <span className="summary-unit">mm</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                VAZÃO MINA MÉDIA{" "}
-                <i className="pi pi-sliders-h text-orange-500" />
-              </div>
-              <div className="summary-value">
-                {summary.vazaoMina}
-                <span className="summary-unit">m³/h</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    } else if (tipoSelecionado === "PP") {
-      return (
-        <div className="grid mb-4">
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                NÍVEL ESTÁTICO MÉDIO{" "}
-                <i className="pi pi-chart-line text-yellow-500" />
-              </div>
-              <div className="summary-value">
-                {summary.nivelEstatico}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                COTA SUPERFÍCIE MÉDIA{" "}
-                <i className="pi pi-chart-bar text-orange-500" />
-              </div>
-              <div className="summary-value">
-                {summary.cotaSuperficie}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                COTA BASE MÉDIA{" "}
-                <i className="pi pi-arrow-down text-purple-500" />
-              </div>
-              <div className="summary-value">
-                {summary.cotaBase}
-                <span className="summary-unit">m</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                PRECIPITAÇÃO MÉDIA <i className="pi pi-cloud text-blue-500" />
-              </div>
-              <div className="summary-value">
-                {summary.precipitacao}
-                <span className="summary-unit">mm</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                VAZÃO MINA MÉDIA{" "}
-                <i className="pi pi-sliders-h text-orange-500" />
-              </div>
-              <div className="summary-value">
-                {summary.vazaoMina}
-                <span className="summary-unit">m³/h</span>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 md:col-6 lg:col-3">
-            <div className="summary-card">
-              <div className="summary-title">
-                TOTAL DE MEDIÇÕES <i className="pi pi-file text-green-500" />
-              </div>
-              <div className="summary-value">
-                {summary.total}
-                <span className="summary-unit">reg</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     return null;
   };
 
@@ -958,7 +778,7 @@ export default function GraficoPiezometro() {
       </div>
 
       {/* CARDS DINÂMICOS */}
-      {renderizarCards()}
+      {/* Removido conforme solicitado */}
 
       {/*GŔAFICO*/}
       <div className="chart-container">
