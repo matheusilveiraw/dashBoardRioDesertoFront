@@ -103,7 +103,6 @@ export default function QualidadeAgua({
             const response = await getColetaCompletaPorIdDataInicioDataFimApi(pontoSelecionado, inicio, fim);
             const data = response.data;
             setDadosColeta(data);
-            console.log("Dados carregados:", data);
         } catch (error) {
             console.error("Erro ao buscar dados:", error);
         } finally {

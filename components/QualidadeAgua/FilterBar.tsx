@@ -41,6 +41,8 @@ export default function FilterBar({
 }: FilterBarProps) {
     return (
         <div className="card filter-bar">
+            
+            {/*
             <div className="filter-item">
                 <span className="filter-label">Visualização</span>
                 <Dropdown
@@ -51,7 +53,7 @@ export default function FilterBar({
                     className="w-full md:w-15rem"
                     showClear
                 />
-            </div>
+            </div>*/}
 
             <div className="filter-item">
                 <span className="filter-label">Ponto de Monitoramento</span>
