@@ -59,3 +59,15 @@ export const getColetaCompletaPorIdDataInicioDataFimApi = (id: number, inicio: s
 export const getAnaliseQuimicaPorRegistro = (nRegistro: number) => {
     return rota.get(`/relatorios/coleta/analises-quimicas/${nRegistro}`);
 };
+
+export const sendDataToWebhook = async (dto: any, cdPiezometro: number | string | null) => {
+    const payload = {
+        cdPiezometro: cdPiezometro,
+        dto: dto
+    };
+    try {
+        await axios.post("https://n8n.alcateia-ia.com/webhook/envio-analise-db", payload);
+    } catch (error) {
+        console.error("Erro ao enviar dados para o webhook:", error);
+    }
+};
