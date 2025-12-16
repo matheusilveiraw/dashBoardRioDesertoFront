@@ -40,7 +40,7 @@ const AppMenu = () => {
         },
         {
           label: "Qualiadade da Água",
-          to: "pages/qualidade-agua",
+          to: "/pages/qualidade-agua",
           icon: "pi pi-fw pi-chart-line",
         },
       ],
