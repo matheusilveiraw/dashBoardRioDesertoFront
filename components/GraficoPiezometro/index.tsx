@@ -184,6 +184,7 @@ export default function GraficoPiezometro() {
 
   return (
     <div className="col-12">
+      <h1>Nível Estático, precipitação e vazão</h1>
       {/* Barra de Filtros */}
       <FilterBar
         opcoesFiltro={opcoesFiltro}
