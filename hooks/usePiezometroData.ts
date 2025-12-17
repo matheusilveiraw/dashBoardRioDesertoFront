@@ -96,6 +96,9 @@ export const usePiezometroData = () => {
     const [analisesQuimicas, setAnalisesQuimicas] = useState<Record<number, any>>({});
     const [carregandoAnalise, setCarregandoAnalise] = useState<Record<number, boolean>>({});
 
+    const [analiseIANivelEstatico, setAnaliseIANivelEstatico] = useState<string | null>(null);
+    const [carregandoIANivelEstatico, setCarregandoIANivelEstatico] = useState<boolean>(false);
+
 
     // Opções de filtro (constante)
     const opcoesFiltro = [
@@ -185,6 +188,10 @@ export const usePiezometroData = () => {
         const fimFormatado = formatarData(dataFim);
 
         try {
+            setCarregando(true);
+            setCarregandoIANivelEstatico(true);
+            setAnaliseIANivelEstatico(null); 
+
             const resposta = await getPiezometroPorIdDataInicioDataFimApi(
                 idSelecionado,
                 inicioFormatado,
@@ -192,7 +199,8 @@ export const usePiezometroData = () => {
             );
 
             if (resposta.data && resposta.data.length > 0) {
-                webHookIAAnaliseNivelEstatico(resposta.data, idSelecionado);
+                const iaResponse = await webHookIAAnaliseNivelEstatico(resposta.data, idSelecionado);
+                setAnaliseIANivelEstatico(iaResponse?.output);
             }
 
             const respostaColeta = await getColetaPorIdDataInicioDataFimApi(
@@ -526,6 +534,9 @@ export const usePiezometroData = () => {
                 text: "Não foi possível obter os dados do relatório."
             });
             console.error("Erro ao carregar gráfico", err);
+        } finally {
+            setCarregando(false);
+            setCarregandoIANivelEstatico(false);
         }
     }, [filters]);
 
@@ -582,5 +593,9 @@ export const usePiezometroData = () => {
         analisesQuimicas,        
         carregandoAnalise,       
         buscarAnaliseQuimica,
+
+        // relacionados a analise ia nivel estatico
+        analiseIANivelEstatico,
+        carregandoIANivelEstatico,
     };
 };
