@@ -12,6 +12,7 @@ export type QualidadeAguaProps = {
     initialMesAnoInicio?: string;
     initialMesAnoFim?: string;
     autoApply?: boolean;
+    isReport?: boolean;
 };
 
 export default function QualidadeAgua({
@@ -19,6 +20,7 @@ export default function QualidadeAgua({
     initialMesAnoInicio,
     initialMesAnoFim,
     autoApply = false,
+    isReport = false,
 }: QualidadeAguaProps = {}) {
     const [tipoFiltroSelecionado, setTipoFiltroSelecionado] = useState<string | null>(null);
     const [pontoSelecionado, setPontoSelecionado] = useState<number | null>(null);
@@ -113,26 +115,62 @@ export default function QualidadeAgua({
 
         finalPrintContainer.appendChild(pointNameEl);
 
-        // Clona e processa os gráficos
-        const chartsClone = chartsContainer.cloneNode(true) as HTMLElement;
-        const originalCanvases = chartsContainer.querySelectorAll('canvas');
-        const clonedCanvases = chartsClone.querySelectorAll('canvas');
+        finalPrintContainer.appendChild(pointNameEl);
 
-        originalCanvases.forEach((canvas, index) => {
-            if (clonedCanvases[index]) {
+        // Processa os gráficos: pega cada div de gráfico individualmente
+        const chartContainers = chartsContainer.querySelectorAll('.chart-container');
+
+        chartContainers.forEach((container) => {
+            const containerClone = container.cloneNode(true) as HTMLElement;
+
+            // Remove classes que podem atrapalhar o layout de impressão
+            containerClone.classList.remove('h-full');
+            containerClone.style.height = 'auto';
+            containerClone.style.width = '100%';
+            containerClone.style.display = 'block';
+
+            // Corrige o canvas dentro do clone
+            const originalCanvas = container.querySelector('canvas');
+            const clonedCanvas = containerClone.querySelector('canvas');
+
+            if (originalCanvas && clonedCanvas) {
                 const img = document.createElement('img');
-                img.src = canvas.toDataURL("image/png");
+                img.src = originalCanvas.toDataURL("image/png");
                 img.style.width = '100%';
-                clonedCanvases[index].parentNode?.replaceChild(img, clonedCanvases[index]);
-            }
-        });
+                img.style.height = 'auto'; // Garante proporção
+                img.style.display = 'block'; // Evita espaços fantasmas inline
 
-        finalPrintContainer.appendChild(chartsClone);
+                const parent = clonedCanvas.parentNode as HTMLElement;
+                if (parent) {
+                    parent.replaceChild(img, clonedCanvas);
+                    // Remove restrições do wrapper do PrimeReact/Chart.js
+                    parent.style.height = 'auto';
+                    parent.style.width = '100%';
+                    parent.style.position = 'static'; // Evita posicionamento relativo que segure altura
+                    // Remove classes que possam dar altura fixa
+                    parent.className = '';
+                }
+            }
+
+            // Garante estilo de lista vertical para o PDF
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '20px';
+            wrapper.style.width = '65%'; // Reduz o tamanho visual
+            wrapper.style.marginLeft = 'auto'; // Centraliza
+            wrapper.style.marginRight = 'auto'; // Centraliza
+            wrapper.style.breakInside = 'avoid'; // Propriedade padrão moderna
+            wrapper.style.pageBreakInside = 'avoid'; // Fallback
+            wrapper.className = 'html2pdf__page-break'; // Classe auxiliar para legacy mode se necessário
+            wrapper.appendChild(containerClone);
+
+            finalPrintContainer.appendChild(wrapper);
+        });
 
         // Processa texto da IA
         const analiseText = (analiseIAEl as HTMLElement).innerText;
         const analiseContainer = document.createElement('div');
         analiseContainer.style.marginTop = '20px';
+        analiseContainer.style.pageBreakInside = 'avoid';
 
         const lines = analiseText.split('\n');
         lines.forEach(line => {
@@ -153,6 +191,7 @@ export default function QualidadeAgua({
             image: { type: "jpeg" as const, quality: 0.98 },
             html2canvas: { scale: 2, letterRendering: true },
             jsPDF: { unit: "in", format: "letter", orientation: "landscape" as const },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         html2pdf().from(finalPrintContainer).set(opt).save();
@@ -260,7 +299,7 @@ export default function QualidadeAgua({
 
             {dadosColeta && dadosColeta.amostras && (
                 <div className="mt-5">
-                    <GraficosAnalise dados={dadosColeta} />
+                    <GraficosAnalise dados={dadosColeta} isReport={isReport} />
                 </div>
             )}
 

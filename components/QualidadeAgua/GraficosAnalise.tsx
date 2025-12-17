@@ -17,9 +17,10 @@ interface PropriedadesGrafico {
             };
         };
     };
+    isReport?: boolean;
 }
 
-export default function GraficosAnalise({ dados }: PropriedadesGrafico) {
+export default function GraficosAnalise({ dados, isReport = false }: PropriedadesGrafico) {
 
     // Função para parser de valores numéricos
     const parseValor = (valorStr: string) => {
@@ -326,15 +327,25 @@ export default function GraficosAnalise({ dados }: PropriedadesGrafico) {
 
             <div id="analises-scrap">
                 {charts.length > 0 ? (
-                    <Carousel
-                        value={charts}
-                        numVisible={3}
-                        numScroll={1}
-                        responsiveOptions={responsiveOptions}
-                        itemTemplate={chartTemplate}
-                        circular
-                        autoplayInterval={5000}
-                    />
+                    isReport ? (
+                        <div className="grid">
+                            {charts.map((grafico, index) => (
+                                <div key={index} className="col-12 mb-4">
+                                    {chartTemplate(grafico)}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <Carousel
+                            value={charts}
+                            numVisible={3}
+                            numScroll={1}
+                            responsiveOptions={responsiveOptions}
+                            itemTemplate={chartTemplate}
+                            circular
+                            autoplayInterval={5000}
+                        />
+                    )
                 ) : (
                     <div className="col-12">
                         <div className="chart-container surface-card p-4 shadow-2 border-round">
