@@ -23,7 +23,7 @@ export default function AnaliseIA({ analise, carregando }: AnaliseIAProps) {
         return (
             <div className="card mt-4">
                 <h5>Análise da IA</h5>
-                <p>{analise}</p>
+                <div id="textoApareceNoPdf" style={{ whiteSpace: 'pre-line' }}>{analise}</div>
             </div>
         );
     }

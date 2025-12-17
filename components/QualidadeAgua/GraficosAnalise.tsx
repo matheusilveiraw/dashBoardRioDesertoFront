@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Chart } from 'primereact/chart';
+import { Carousel } from 'primereact/carousel';
 
 interface AnaliseLegislacao {
     simbolo: string;
@@ -247,6 +248,44 @@ export default function GraficosAnalise({ dados }: PropriedadesGrafico) {
         return Object.keys(dados.legislacoes);
     }, [dados]);
 
+    const responsiveOptions = [
+        {
+            breakpoint: '1400px',
+            numVisible: 2,
+            numScroll: 1
+        },
+        {
+            breakpoint: '1199px',
+            numVisible: 2,
+            numScroll: 1
+        },
+        {
+            breakpoint: '767px',
+            numVisible: 1,
+            numScroll: 1
+        }
+    ];
+
+    const chartTemplate = (grafico: any) => {
+        return (
+            <div className="p-2 h-full w-full">
+                <div className="chart-container h-full surface-card p-3 shadow-2 border-round relative">
+                    <div className="chart-header flex justify-content-between align-items-start mb-3" style={{ minHeight: '60px' }}>
+                        <div>
+                            <div className="text-xl font-bold text-900">{grafico.titulo}</div>
+                            <div className={`text-sm ${grafico.hasLegislation ? 'text-600' : 'text-orange-500'}`}>
+                                {grafico.hasLegislation && <i className="pi pi-check-circle text-green-500 mr-1 text-xs"></i>}
+                                {!grafico.hasLegislation && <i className="pi pi-info-circle mr-1 text-xs"></i>}
+                                {grafico.subtitle}
+                            </div>
+                        </div>
+                    </div>
+                    <Chart type="line" data={grafico.chartData} options={grafico.options} height="300px" />
+                </div>
+            </div>
+        );
+    };
+
     if (!dados || !dados.amostras) return null;
 
     return (
@@ -285,25 +324,18 @@ export default function GraficosAnalise({ dados }: PropriedadesGrafico) {
                 </div>
             )}
 
-            <div id="analises-scrap" className="grid">
-                {charts.map((grafico, index) => (
-                    <div key={index} className="col-12 md:col-6 lg:col-6">
-                        <div className="chart-container h-full surface-card p-3 shadow-2 border-round">
-                            <div className="chart-header flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <div className="text-xl font-bold text-900">{grafico.titulo}</div>
-                                    <div className={`text-sm ${grafico.hasLegislation ? 'text-600' : 'text-orange-500'}`}>
-                                        {grafico.hasLegislation && <i className="pi pi-check-circle text-green-500 mr-1 text-xs"></i>}
-                                        {!grafico.hasLegislation && <i className="pi pi-info-circle mr-1 text-xs"></i>}
-                                        {grafico.subtitle}
-                                    </div>
-                                </div>
-                            </div>
-                            <Chart type="line" data={grafico.chartData} options={grafico.options} height="300px" />
-                        </div>
-                    </div>
-                ))}
-                {charts.length === 0 && (
+            <div id="analises-scrap">
+                {charts.length > 0 ? (
+                    <Carousel
+                        value={charts}
+                        numVisible={3}
+                        numScroll={1}
+                        responsiveOptions={responsiveOptions}
+                        itemTemplate={chartTemplate}
+                        circular
+                        autoplayInterval={5000}
+                    />
+                ) : (
                     <div className="col-12">
                         <div className="chart-container surface-card p-4 shadow-2 border-round">
                             <p className="text-center text-600">Nenhum dado analítico encontrado para exibir gráficos.</p>
