@@ -117,6 +117,23 @@ export default function QualidadeAgua({
 
         finalPrintContainer.appendChild(pointNameEl);
 
+        // Processa texto da IA (agora vem ANTES dos gráficos)
+        const analiseText = (analiseIAEl as HTMLElement).innerText;
+        const analiseContainer = document.createElement('div');
+        analiseContainer.style.marginBottom = '20px'; // Espaço antes dos gráficos
+        analiseContainer.style.pageBreakInside = 'avoid';
+
+        const lines = analiseText.split('\n');
+        lines.forEach(line => {
+            const p = document.createElement('p');
+            p.textContent = line || '\u00A0';
+            p.style.color = 'black';
+            p.style.margin = '0';
+            p.style.breakInside = 'avoid';
+            analiseContainer.appendChild(p);
+        });
+        finalPrintContainer.appendChild(analiseContainer);
+
         // Processa os gráficos: pega cada div de gráfico individualmente
         const chartContainers = chartsContainer.querySelectorAll('.chart-container');
 
@@ -166,27 +183,11 @@ export default function QualidadeAgua({
             finalPrintContainer.appendChild(wrapper);
         });
 
-        // Processa texto da IA
-        const analiseText = (analiseIAEl as HTMLElement).innerText;
-        const analiseContainer = document.createElement('div');
-        analiseContainer.style.marginTop = '20px';
-        analiseContainer.style.pageBreakInside = 'avoid';
-
-        const lines = analiseText.split('\n');
-        lines.forEach(line => {
-            const p = document.createElement('p');
-            p.textContent = line || '\u00A0';
-            p.style.color = 'black';
-            p.style.margin = '0';
-            p.style.breakInside = 'avoid';
-            analiseContainer.appendChild(p);
-        });
-        finalPrintContainer.appendChild(analiseContainer);
 
         const html2pdf = (await import("html2pdf.js")).default;
 
         const opt = {
-            margin: 1,
+            margin: 0.2,
             filename: "relatorio-qualidade.pdf",
             image: { type: "jpeg" as const, quality: 0.98 },
             html2canvas: { scale: 2, letterRendering: true },
