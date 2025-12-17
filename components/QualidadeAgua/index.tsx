@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import FilterBar from "./FilterBar";
 import GraficosAnalise from "./GraficosAnalise";
+import AnaliseIA from "./AnaliseIA"; 
 import { getPiezometrosRelatorio, getColetaCompletaPorIdDataInicioDataFimApi, webHookIAAnaliseQualidade } from '@/service/api';
 
-export type QualidadeAguaProps = { //PARA O SCRP
+export type QualidadeAguaProps = {
     initialCdPiezometro?: number; 
     initialMesAnoInicio?: string; 
     initialMesAnoFim?: string;    
@@ -16,7 +17,7 @@ export default function QualidadeAgua({
     initialCdPiezometro,
     initialMesAnoInicio,
     initialMesAnoFim,
-    autoApply = false, //SCRAP OFF
+    autoApply = false,
 }: QualidadeAguaProps = {}) {
     const [tipoFiltroSelecionado, setTipoFiltroSelecionado] = useState<string | null>(null);
     const [pontoSelecionado, setPontoSelecionado] = useState<number | null>(null);
@@ -24,11 +25,14 @@ export default function QualidadeAgua({
     const [dataFim, setDataFim] = useState<Date | null>(null);
     const [carregando, setCarregando] = useState(false);
     const [pontos, setPontos] = useState<any[]>([]);
-
+    
     const [dadosColeta, setDadosColeta] = useState<any>(null);
     const [autoApplied, setAutoApplied] = useState(false);
 
-    // Opções estáticas para visualização
+    // Estados para a análise da IA
+    const [analiseIA, setAnaliseIA] = useState<string | null>(null);
+    const [carregandoIA, setCarregandoIA] = useState(false);
+
     const opcoesFiltro = [
         { label: "Todos os Tipos", value: null },
         { label: "PP - Piezômetro de Profundidade", value: "PP" },
@@ -37,22 +41,18 @@ export default function QualidadeAgua({
         { label: "PC - Calhas", value: "PC" },
     ];
 
-
     useEffect(() => {
         const buscarPiezometros = async () => {
             setCarregando(true);
             try {
                 const response = await getPiezometrosRelatorio(tipoFiltroSelecionado);
                 const data = response.data;
-
                 const pontosFormatados = data.map((item: any) => ({
                     label: item.nm_piezometro,
                     value: item.id_zeus
                 }));
-
                 setPontos(pontosFormatados);
                 setPontoSelecionado(null); 
-
             } catch (error) {
                 console.error("Erro ao buscar piezômetros:", error);
                 setPontos([]);
@@ -60,7 +60,6 @@ export default function QualidadeAgua({
                 setCarregando(false);
             }
         };
-
         buscarPiezometros();
     }, [tipoFiltroSelecionado]);
 
@@ -95,6 +94,9 @@ export default function QualidadeAgua({
         }
 
         setCarregando(true);
+        setCarregandoIA(true);
+        setAnaliseIA(null);
+        setDadosColeta(null);
 
         const formatMonthYear = (date: Date) => {
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -111,18 +113,20 @@ export default function QualidadeAgua({
             setDadosColeta(data);
             
             if (data) {
-                webHookIAAnaliseQualidade(data, pontoSelecionado);
+                const analise = await webHookIAAnaliseQualidade(data, pontoSelecionado);
+                setAnaliseIA(analise);
             }
         } catch (error) {
             console.error("Erro ao buscar dados:", error);
+            setAnaliseIA("Ocorreu um erro ao consultar a IA.");
         } finally {
             setCarregando(false);
+            setCarregandoIA(false);
         }
     };
 
     return (
-
-        < div className="col-12" >
+        <div className="col-12">
             <h1>Qualidade Água</h1>
 
             <FilterBar
@@ -140,11 +144,13 @@ export default function QualidadeAgua({
                 onBuscar={handleBuscar}
             />
 
+            <AnaliseIA carregando={carregandoIA} analise={analiseIA} />
+
             {dadosColeta && dadosColeta.amostras && (
                 <div className="mt-5">
                     <GraficosAnalise dados={dadosColeta} />
                 </div>
             )}
-        </div >
+        </div>
     );
 }

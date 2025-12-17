@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const rota = axios.create({
-    baseURL: "http://192.168.100.95:8080",
-    //baseURL: "http://localhost:8080",
+    //baseURL: "http://192.168.100.95:8080",
+    baseURL: "http://localhost:8080",
     timeout: 10000,
 });
 
@@ -72,14 +72,16 @@ export const webHookIAAnaliseNivelEstatico = async (dto: any, cdPiezometro: numb
     }
 };
 
-export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null) => {
+export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null): Promise<string | null> => {
     const payload = {
         cdPiezometro: cdPiezometro,
         dto: dto
     };
     try {
-        await axios.post("aqui vai ser o lnik do cara novooooo", payload);
+        const response = await axios.post("esperando o kaua fazer esse cara", payload); // <-------------------------
+        return response.data;
     } catch (error) {
         console.error("Erro ao enviar dados para o webhook:", error);
+        return null;
     }
 };
