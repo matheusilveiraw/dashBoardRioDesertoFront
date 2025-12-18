@@ -7,7 +7,7 @@ interface SimpleLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'PrimeReact Sakai',
+    title: 'Dashboard Rio Deserto',
     description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.'
 };
 
