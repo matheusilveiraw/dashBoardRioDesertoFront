@@ -43,6 +43,11 @@ const AppMenu = () => {
           to: "/pages/qualidade-agua",
           icon: "pi pi-fw pi-chart-line",
         },
+        {
+          label: "Mapa",
+          to: "/pages/mapa",
+          icon: "pi pi-fw pi-chart-line",
+        },
       ],
     },
   ];

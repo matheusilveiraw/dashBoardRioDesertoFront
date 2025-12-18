@@ -63,7 +63,6 @@ export default function QualidadeAgua({
         buscarPiezometros();
     }, [tipoFiltroSelecionado]);
 
-    // Limpa dados quando os filtros mudam
     useEffect(() => {
         setDadosColeta(null);
         setAnaliseIA(null);
@@ -115,12 +114,9 @@ export default function QualidadeAgua({
 
         finalPrintContainer.appendChild(pointNameEl);
 
-        finalPrintContainer.appendChild(pointNameEl);
-
-        // Processa texto da IA (agora vem ANTES dos gráficos)
         const analiseText = (analiseIAEl as HTMLElement).innerText;
         const analiseContainer = document.createElement('div');
-        analiseContainer.style.marginBottom = '20px'; // Espaço antes dos gráficos
+        analiseContainer.style.marginBottom = '20px';
         analiseContainer.style.pageBreakInside = 'avoid';
 
         const lines = analiseText.split('\n');
@@ -134,19 +130,16 @@ export default function QualidadeAgua({
         });
         finalPrintContainer.appendChild(analiseContainer);
 
-        // Processa os gráficos: pega cada div de gráfico individualmente
         const chartContainers = chartsContainer.querySelectorAll('.chart-container');
 
-        chartContainers.forEach((container) => {
+        chartContainers.forEach((container, index) => {
             const containerClone = container.cloneNode(true) as HTMLElement;
 
-            // Remove classes que podem atrapalhar o layout de impressão
             containerClone.classList.remove('h-full');
             containerClone.style.height = 'auto';
             containerClone.style.width = '100%';
             containerClone.style.display = 'block';
 
-            // Corrige o canvas dentro do clone
             const originalCanvas = container.querySelector('canvas');
             const clonedCanvas = containerClone.querySelector('canvas');
 
@@ -154,30 +147,31 @@ export default function QualidadeAgua({
                 const img = document.createElement('img');
                 img.src = originalCanvas.toDataURL("image/png");
                 img.style.width = '100%';
-                img.style.height = 'auto'; // Garante proporção
-                img.style.display = 'block'; // Evita espaços fantasmas inline
-
+                img.style.height = 'auto';
+                img.style.display = 'block';
                 const parent = clonedCanvas.parentNode as HTMLElement;
                 if (parent) {
                     parent.replaceChild(img, clonedCanvas);
-                    // Remove restrições do wrapper do PrimeReact/Chart.js
                     parent.style.height = 'auto';
                     parent.style.width = '100%';
-                    parent.style.position = 'static'; // Evita posicionamento relativo que segure altura
-                    // Remove classes que possam dar altura fixa
+                    parent.style.position = 'static';
                     parent.className = '';
                 }
             }
 
-            // Garante estilo de lista vertical para o PDF
             const wrapper = document.createElement('div');
-            wrapper.style.marginBottom = '20px';
-            wrapper.style.width = '65%'; // Reduz o tamanho visual
-            wrapper.style.marginLeft = 'auto'; // Centraliza
-            wrapper.style.marginRight = 'auto'; // Centraliza
-            wrapper.style.breakInside = 'avoid'; // Propriedade padrão moderna
-            wrapper.style.pageBreakInside = 'avoid'; // Fallback
-            wrapper.className = 'html2pdf__page-break'; // Classe auxiliar para legacy mode se necessário
+            wrapper.style.width = '65%';
+            wrapper.style.marginLeft = 'auto';
+            wrapper.style.marginRight = 'auto';
+            wrapper.style.marginTop = '40px';
+            wrapper.style.marginBottom = '40px';
+            wrapper.style.textAlign = 'center';
+            wrapper.style.pageBreakInside = 'avoid';
+
+            if (index < chartContainers.length - 1) {
+                wrapper.style.pageBreakAfter = 'always';
+            }
+
             wrapper.appendChild(containerClone);
 
             finalPrintContainer.appendChild(wrapper);
