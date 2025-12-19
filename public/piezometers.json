@@ -1,0 +1,182 @@
+[
+    {
+        "id": "pzp-03",
+        "nome": "PZP 03",
+        "tipo": "PZP",
+        "x": 500.838,
+        "y": 600.293,
+        "cotaSup": "12,192m",
+        "cotaBase": "-37,808m"
+    },
+    {
+        "id": "pzp-05",
+        "nome": "PZP 05",
+        "tipo": "PZP",
+        "x": 492.574,
+        "y": 328.571,
+        "cotaSup": "10,402m",
+        "cotaBase": "-54,590m"
+    },
+    {
+        "id": "pzp-06",
+        "nome": "PZP 06",
+        "tipo": "PZP",
+        "x": 490.905,
+        "y": 486.089,
+        "cotaSup": "14,001m",
+        "cotaBase": "-35,999m"
+    },
+    {
+        "id": "pzp-08",
+        "nome": "PZP 08",
+        "tipo": "PZP",
+        "x": 467.621,
+        "y": 669.747,
+        "cotaSup": "13,234m",
+        "cotaBase": "-40,766m"
+    },
+    {
+        "id": "pzp-15",
+        "nome": "PZP 15",
+        "tipo": "PZP",
+        "x": 527.318,
+        "y": 550.121,
+        "cotaSup": "10,680m",
+        "cotaBase": "-23,820m"
+    },
+    {
+        "id": "pzp-18",
+        "nome": "PZP 18",
+        "tipo": "PZP",
+        "x": 495.199,
+        "y": 582.045,
+        "cotaSup": "12,971m",
+        "cotaBase": "-22,029m"
+    },
+    {
+        "id": "pzp-19",
+        "nome": "PZP 19",
+        "tipo": "PZP",
+        "x": 447.139,
+        "y": 546.897,
+        "cotaSup": "12,841m",
+        "cotaBase": "-42,159m"
+    },
+    {
+        "id": "pzp-20",
+        "nome": "PZP 20",
+        "tipo": "PZP",
+        "x": 475.466,
+        "y": 584.147,
+        "cotaSup": "17,066m",
+        "cotaBase": "-39,247m"
+    },
+    {
+        "id": "pzp-22",
+        "nome": "PZP 22",
+        "tipo": "PZP",
+        "x": 538.468,
+        "y": 609.269,
+        "cotaSup": "10,196m",
+        "cotaBase": "-54,804m"
+    },
+    {
+        "id": "pzp-23",
+        "nome": "PZP 23",
+        "tipo": "PZP",
+        "x": 420.152,
+        "y": 562.384,
+        "cotaSup": "15,194m",
+        "cotaBase": "-24,806m"
+    },
+    {
+        "id": "pzp-27",
+        "nome": "PZP 27",
+        "tipo": "PZP",
+        "x": 456.601,
+        "y": 575.105,
+        "cotaSup": "16,612m",
+        "cotaBase": "-3,588m"
+    },
+    {
+        "id": "pzp-28",
+        "nome": "PZP 28",
+        "tipo": "PZP",
+        "x": 482.918,
+        "y": 696.848,
+        "cotaSup": "12,611m",
+        "cotaBase": "-60,389m"
+    },
+    {
+        "id": "pzp-30",
+        "nome": "PZP 30",
+        "tipo": "PZP",
+        "x": 493.029,
+        "y": 633.101,
+        "cotaSup": "13,394m",
+        "cotaBase": "-34,636m"
+    },
+    {
+        "id": "pzp-31",
+        "nome": "PZP 31",
+        "tipo": "PZP",
+        "x": 468.873,
+        "y": 614.875,
+        "cotaSup": "13,583m",
+        "cotaBase": "-27,927m"
+    },
+    {
+        "id": "pzp-33",
+        "nome": "PZP 33",
+        "tipo": "PZP",
+        "x": 477.353,
+        "y": 553.689,
+        "cotaSup": "14,146m",
+        "cotaBase": "-3,854m"
+    },
+    {
+        "id": "pfc-01",
+        "nome": "PFC - 01",
+        "tipo": "PFC",
+        "x": 443.226,
+        "y": 615.822,
+        "cotaSup": "N/A",
+        "cotaBase": "N/A"
+    },
+    {
+        "id": "pfc-02",
+        "nome": "PFC - 02",
+        "tipo": "PFC",
+        "x": 442.976,
+        "y": 600.259,
+        "cotaSup": "N/A",
+        "cotaBase": "N/A"
+    },
+    {
+        "id": "pfc-03",
+        "nome": "PFC - 03",
+        "tipo": "PFC",
+        "x": 443.354,
+        "y": 598.829,
+        "cotaSup": "N/A",
+        "cotaBase": "N/A"
+    },
+    {
+        "id": "pfc-04",
+        "nome": "PFC - 04",
+        "tipo": "PFC",
+        "x": 438.426,
+        "y": 592.814,
+        "cotaSup": "N/A",
+        "cotaBase": "N/A"
+    },
+    {
+        "id": "pfc-05",
+        "nome": "PFC - 05",
+        "tipo": "PFC",
+        "x": 432.466,
+        "y": 635.813,
+        "cotaSup": "N/A",
+        "cotaBase": "N/A"
+    }
+]
