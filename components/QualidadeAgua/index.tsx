@@ -236,10 +236,7 @@ export default function QualidadeAgua({
             setDadosColeta(data);
 
             if (data && data.amostras) {
-                // Chama Webhook da IA
                 const iaResponse = await webHookIAAnaliseQualidade(data, pontoSelecionado) as any;
-                // Verificando se a resposta é um objeto com campo output (como no piezometro) ou string direta
-                // Pela lógica anterior, assumindo que seja similar ou tratando o retorno
                 if (typeof iaResponse === 'string') {
                     setAnaliseIA(iaResponse);
                 } else if (iaResponse && iaResponse[0] && iaResponse[0].output) {
@@ -298,7 +295,11 @@ export default function QualidadeAgua({
                 </div>
             )}
 
-            <AnaliseIA carregando={carregando} analise={analiseIA} />
+            <AnaliseIA
+                carregando={carregando}
+                analise={analiseIA}
+                onSave={(text) => setAnaliseIA(text)}
+            />
         </div>
     );
 }
