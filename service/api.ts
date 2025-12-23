@@ -60,6 +60,10 @@ export const getAnaliseQuimicaPorRegistro = (nRegistro: number) => {
     return rota.get(`/relatorios/coleta/analises-quimicas/${nRegistro}`);
 };
 
+export const getHistoricoCompletoApi = (idZeus: number) => {
+    return rota.get(`/qualidade-agua/historico-completo/${idZeus}`);
+};
+
 export const webHookIAAnaliseNivelEstatico = async (dto: any, cdPiezometro: number | string | null) => {
     const payload = {
         cdPiezometro: cdPiezometro,
@@ -74,10 +78,11 @@ export const webHookIAAnaliseNivelEstatico = async (dto: any, cdPiezometro: numb
     }
 };
 
-export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null, filtros: string[]): Promise<string | null> => {
+export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null, filtros: string[], historico: any): Promise<string | null> => {
     const payload = {
         cdPiezometro: cdPiezometro,
-        dto: {
+        historico: historico,
+        analiseUsuario: {
             ...dto,
             filtros: filtros
         }

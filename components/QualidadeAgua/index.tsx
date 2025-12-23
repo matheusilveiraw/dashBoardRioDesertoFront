@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import FilterBar from "./FilterBar";
 import GraficosAnalise from "./GraficosAnalise";
 import AnaliseIA from "./AnaliseIA";
-import { getPiezometrosRelatorio, postColetaCompletaFiltroApi, webHookIAAnaliseQualidade, getParametrosLegislacaoBuscaDadosRelacionados } from '@/service/api';
+import { getPiezometrosRelatorio, postColetaCompletaFiltroApi, webHookIAAnaliseQualidade, getParametrosLegislacaoBuscaDadosRelacionados, getHistoricoCompletoApi } from '@/service/api';
 import Swal from "sweetalert2";
 import { SplitButton } from 'primereact/splitbutton';
 import { saveAs } from 'file-saver';
@@ -326,15 +326,17 @@ export default function QualidadeAgua({
                     .filter(p => itensSelecionados.includes(p.id_analise))
                     .map(p => `${p.nome} (${p.simbolo})`);
 
-                const iaResponse = await webHookIAAnaliseQualidade(data, pontoSelecionado, filtrosStrings) as any;
+                const historyResponse = await getHistoricoCompletoApi(pontoSelecionado);
+                const historicoData = historyResponse.data;
+
+                const iaResponse = await webHookIAAnaliseQualidade(data, pontoSelecionado, filtrosStrings, historicoData) as any;
                 if (typeof iaResponse === 'string') {
                     setAnaliseIA(iaResponse);
                 } else if (iaResponse && iaResponse[0] && iaResponse[0].output) {
-                    setAnaliseIA(iaResponse[0].output); // Padrão n8n array
+                    setAnaliseIA(iaResponse[0].output);
                 } else if (iaResponse && iaResponse.output) {
                     setAnaliseIA(iaResponse.output);
                 } else {
-                    // Fallback se for objeto direto
                     setAnaliseIA(JSON.stringify(iaResponse));
                 }
             }
