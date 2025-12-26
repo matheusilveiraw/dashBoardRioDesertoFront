@@ -14,8 +14,8 @@ import Swal from "sweetalert2";
 
 import {
   getPiezometrosAtivos,
-  getPiezometroPorIdDataInicioDataFimApi,
 } from "@/service/api";
+import { getPiezometroFiltroComHistoricoApi } from "@/service/nivelEstaticoApis";
 import { formatarData } from "@/utils/formatarData";
 
 interface GraficoPiezometroProps {
@@ -31,7 +31,7 @@ export default function GraficoPiezometro({
   initialMesAnoFim,
   autoApply, //SCRAP OFF
 
-}: GraficoPiezometroProps) { 
+}: GraficoPiezometroProps) {
   const [piezometros, setPiezometros] = useState<any[]>([]);
   const [idSelecionado, setIdSelecionado] = useState<number | null | string>(null);
   const [tipoSelecionado, setTipoSelecionado] = useState<string | null>(null);
@@ -193,13 +193,15 @@ export default function GraficoPiezometro({
     const fimFormatado = formatarData(dataFim);
 
     try {
-      const resposta = await getPiezometroPorIdDataInicioDataFimApi(
+      const resposta = await getPiezometroFiltroComHistoricoApi(
         idSelecionado,
         inicioFormatado,
         fimFormatado
       );
 
-      let dados = [...resposta.data].sort((a: any, b: any) => {
+      const dadosFiltrados = resposta.data.dadosFiltrados || [];
+
+      let dados = [...dadosFiltrados].sort((a: any, b: any) => {
         return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
       });
 
@@ -337,16 +339,16 @@ export default function GraficoPiezometro({
       const avgPrecip =
         total > 0
           ? dados.reduce(
-              (acc: number, curr: any) => acc + (curr.precipitacao || 0),
-              0
-            ) / total
+            (acc: number, curr: any) => acc + (curr.precipitacao || 0),
+            0
+          ) / total
           : 0;
       const avgVazaoMina =
         total > 0
           ? dados.reduce(
-              (acc: number, curr: any) => acc + (curr.vazao_bombeamento || 0),
-              0
-            ) / total
+            (acc: number, curr: any) => acc + (curr.vazao_bombeamento || 0),
+            0
+          ) / total
           : 0;
 
       let avgNivel = 0;
@@ -358,46 +360,46 @@ export default function GraficoPiezometro({
         avgNivel =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.nivel_estatico || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.nivel_estatico || 0),
+              0
+            ) / total
             : 0;
         avgCotaSuperficie =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.cota_superficie || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.cota_superficie || 0),
+              0
+            ) / total
             : 0;
         avgCotaBase =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.cota_base || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.cota_base || 0),
+              0
+            ) / total
             : 0;
       } else if (tipoPiezometro === "PR") {
         avgCotaSuperficie =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.cota_superficie || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.cota_superficie || 0),
+              0
+            ) / total
             : 0;
         avgNivel =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.nivel_estatico || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.nivel_estatico || 0),
+              0
+            ) / total
             : 0;
       } else if (ehPCouPV) {
         avgVazao =
           total > 0
             ? dados.reduce(
-                (acc: number, curr: any) => acc + (curr.vazao_calha || 0),
-                0
-              ) / total
+              (acc: number, curr: any) => acc + (curr.vazao_calha || 0),
+              0
+            ) / total
             : 0;
       }
 
@@ -751,7 +753,7 @@ export default function GraficoPiezometro({
           <div className="flex gap-2">
             <Calendar
               value={dataInicio}
-              onChange={(e:any) => setDataInicio(e.value)}
+              onChange={(e: any) => setDataInicio(e.value)}
               dateFormat="mm/yy"
               view="month"
               placeholder="Início"
@@ -759,7 +761,7 @@ export default function GraficoPiezometro({
             />
             <Calendar
               value={dataFim}
-              onChange={(e:any) => setDataFim(e.value)}
+              onChange={(e: any) => setDataFim(e.value)}
               dateFormat="mm/yy"
               view="month"
               placeholder="Fim"
@@ -786,11 +788,10 @@ export default function GraficoPiezometro({
         <div className="chart-header">
           <div className="chart-title">
             {tabelaDados.length > 0 && tipoSelecionado
-              ? `Dados do ${
-                  tipoSelecionado === "PP" || tipoSelecionado === "PR"
-                    ? "Piezômetro"
-                    : "Recurso Hídrico"
-                }`
+              ? `Dados do ${tipoSelecionado === "PP" || tipoSelecionado === "PR"
+                ? "Piezômetro"
+                : "Recurso Hídrico"
+              }`
               : "Níveis Piezométricos e Dados Ambientais"}
           </div>
           {renderizarLegendaGrafico()}
