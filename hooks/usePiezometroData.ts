@@ -6,11 +6,10 @@ import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import {
     getPiezometrosAtivos,
-    getPiezometroPorIdDataInicioDataFimApi,
     getColetaPorIdDataInicioDataFimApi,
     getAnaliseQuimicaPorRegistro,
-    webHookIAAnaliseNivelEstatico
 } from "@/service/api";
+import { getPiezometroFiltroComHistoricoApi, webHookIAAnaliseNivelEstatico } from "@/service/nivelEstaticoApis";
 import { formatarData } from "@/utils/formatarData";
 
 interface PiezometroOption {
@@ -203,14 +202,17 @@ export const usePiezometroData = () => {
             setAnaliseIANivelEstatico(null);
             setAnaliseOriginalIA(null);
 
-            const resposta = await getPiezometroPorIdDataInicioDataFimApi(
+            const resposta = await getPiezometroFiltroComHistoricoApi(
                 idSelecionado,
                 inicioFormatado,
                 fimFormatado
             );
 
-            if (resposta.data && resposta.data.length > 0) {
-                const iaResponse = await webHookIAAnaliseNivelEstatico(resposta.data, idSelecionado);
+            const dadosFiltrados = resposta.data.dadosFiltrados || [];
+            const historicoCompleto = resposta.data.historicoCompleto || [];
+
+            if (dadosFiltrados.length > 0) {
+                const iaResponse = await webHookIAAnaliseNivelEstatico(dadosFiltrados, idSelecionado, historicoCompleto);
                 setAnaliseIANivelEstatico(iaResponse[0].output);
                 setAnaliseOriginalIA(iaResponse[0].output);
             }
@@ -223,7 +225,7 @@ export const usePiezometroData = () => {
 
             setColetaDados(respostaColeta.data || []);
 
-            let dados = [...resposta.data].sort((a: any, b: any) => {
+            let dados = [...dadosFiltrados].sort((a: any, b: any) => {
                 return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
             });
 

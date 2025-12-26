@@ -27,14 +27,6 @@ export const getPiezometrosRelatorio = (tipos: string | string[] | null = null) 
 };
 
 // Dados de nível estático (GraficoPiezometro)
-export const getPiezometroPorIdDataInicioDataFimApi = (id: number | string | null, inicio: string, fim: string) => {
-    return rota.get(`/relatorios/piezometro/${id}/filtro`, {
-        params: {
-            mesAnoInicio: inicio,
-            mesAnoFim: fim
-        }
-    });
-};
 
 // Usado para dados de coleta simples (GraficoPiezometro - Tabela Coleta)
 export const getColetaPorIdDataInicioDataFimApi = (id: number, inicio: string, fim: string) => {
@@ -64,19 +56,6 @@ export const getHistoricoCompletoApi = (idZeus: number) => {
     return rota.get(`/qualidade-agua/historico-completo/${idZeus}`);
 };
 
-export const webHookIAAnaliseNivelEstatico = async (dto: any, cdPiezometro: number | string | null) => {
-    const payload = {
-        cdPiezometro: cdPiezometro,
-        dados: dto
-    };
-    try {
-        const response = await axios.post("https://n8n.alcateia-ia.com/webhook/envio-analise-db", payload);
-        return response.data;
-    } catch (error) {
-        console.error("Erro ao enviar dados para o webhook:", error);
-        return null;
-    }
-};
 
 export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null, filtros: string[], historico: any): Promise<string | null> => {
     const payload = {
