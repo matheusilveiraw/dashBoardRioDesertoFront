@@ -1,9 +1,12 @@
 import axios from "axios";
 
 export const rota = axios.create({
-    baseURL: "http://192.168.100.95:8080",
+    baseURL: "https://nonabsorbing-preston-unmisanthropical.ngrok-free.dev",
     // baseURL: "http://localhost:8080",
     timeout: 400000,
+    headers: {
+        "ngrok-skip-browser-warning": "true"
+    }
 });
 
 // Busca piezômetros com opção de filtro por tipos (array de strings)
