@@ -78,18 +78,6 @@ export default function FilterBar(
           panelClassName="dropdown-panel-mobile"
         />
       </div>
-
-      <div className="filter-item" style={{ flexDirection: 'row', alignItems: 'center', paddingTop: '1.25rem' }}>
-        <Checkbox
-          inputId="porDia"
-          checked={porDia}
-          onChange={(e) => onPorDiaChange(e.checked || false)}
-        />
-        <label htmlFor="porDia" className="ml-2 cursor-pointer font-bold" style={{ color: '#ccc' }}>
-          Por dia
-        </label>
-      </div>
-
       <div className="filter-item">
         <span className="filter-label">Período</span>
         <div className="flex gap-2">
@@ -114,6 +102,17 @@ export default function FilterBar(
             appendTo="self"
           />
         </div>
+      </div>
+
+      <div className="filter-item" style={{ flexDirection: 'row', alignItems: 'center', paddingTop: '1.25rem' }}>
+        <Checkbox
+          inputId="porDia"
+          checked={porDia}
+          onChange={(e) => onPorDiaChange(e.checked || false)}
+        />
+        <label htmlFor="porDia" className="ml-2 cursor-pointer font-bold" style={{ color: '#ccc' }}>
+          Por dia
+        </label>
       </div>
 
       <div className="ml-auto">
