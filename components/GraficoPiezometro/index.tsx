@@ -5,7 +5,6 @@ import { useRef, useState } from "react";
 import { Chart } from "primereact/chart";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import ColetaTable from "./ColetaTable";
 import AnaliseIA from "./AnaliseIA";
 import { SplitButton } from 'primereact/splitbutton';
 
@@ -30,16 +29,6 @@ export default function GraficoPiezometro() {
     updateFilters,
     handleSelecionarPiezometro,
     buscarGrafico,
-
-    // relacionados as dados das coletas
-    coletaDados,
-    expandedRows,
-    setExpandedRows,
-
-    //relacionados as analises quimicas dentro de coletas
-    analisesQuimicas,
-    carregandoAnalise,
-    buscarAnaliseQuimica,
 
     // relacionados a analise ia nivel estatico
     analiseIANivelEstatico,
@@ -468,20 +457,6 @@ export default function GraficoPiezometro() {
         </div>
       )}
 
-      {/* TABELA DE COLETA */}
-
-      {coletaDados && coletaDados.length > 0 && (
-        <div className="avoid-break">
-          <ColetaTable
-            data={coletaDados}
-            expandedRows={expandedRows}
-            onRowToggle={(e) => setExpandedRows(e.data)}
-            analisesQuimicas={analisesQuimicas}
-            carregandoAnalise={carregandoAnalise}
-            buscarAnaliseQuimica={buscarAnaliseQuimica}
-          />
-        </div>
-      )}
     </div>
   );
 }

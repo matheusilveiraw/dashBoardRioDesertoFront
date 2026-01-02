@@ -6,8 +6,6 @@ import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import {
     getPiezometrosAtivos,
-    getColetaPorIdDataInicioDataFimApi,
-    getAnaliseQuimicaPorRegistro,
 } from "@/service/api";
 import { getPiezometroFiltroComHistoricoApi, getPiezometroDiarioApi, webHookIAAnaliseNivelEstatico } from "@/service/nivelEstaticoApis";
 import { formatarData } from "@/utils/formatarData";
@@ -89,15 +87,7 @@ export const usePiezometroData = () => {
         total: 0
     });
 
-    //da tabela de coletas
     const [tabelaDados, setTabelaDados] = useState<TabelaDado[]>([]);
-    const [coletaDados, setColetaDados] = useState<any[]>([]);
-    const [expandedRows, setExpandedRows] = useState<any>(null);
-
-    //das analises dentro de coletas
-    const [analisesQuimicas, setAnalisesQuimicas] = useState<Record<number, any>>({});
-    const [carregandoAnalise, setCarregandoAnalise] = useState<Record<number, boolean>>({});
-
     const [analiseIANivelEstatico, setAnaliseIANivelEstatico] = useState<string | null>(null);
     const [analiseOriginalIA, setAnaliseOriginalIA] = useState<string | null>(null);
     const [carregandoIANivelEstatico, setCarregandoIANivelEstatico] = useState<boolean>(false);
@@ -137,25 +127,25 @@ export const usePiezometroData = () => {
             return `${ano}-${mes}-${dia}`;
         };
 
-        precipitacao.forEach((item: any) => {
+        (precipitacao || []).forEach((item: any) => {
             const dt = converterData(item.data);
             if (!mapaDados[dt]) mapaDados[dt] = { mes_ano: dt };
             mapaDados[dt].precipitacao = item.precipitacao;
         });
 
-        nivel_estatico.forEach((item: any) => {
+        (nivel_estatico || []).forEach((item: any) => {
             const dt = converterData(item.data);
             if (!mapaDados[dt]) mapaDados[dt] = { mes_ano: dt };
             mapaDados[dt].nivel_estatico = item.nivel_estatico;
         });
 
-        vazao_bombeamento.forEach((item: any) => {
+        (vazao_bombeamento || []).forEach((item: any) => {
             const dt = converterData(item.data);
             if (!mapaDados[dt]) mapaDados[dt] = { mes_ano: dt };
             mapaDados[dt].vazao_bombeamento = item.vazao_bombeamento;
         });
 
-        vazao_calha.forEach((item: any) => {
+        (vazao_calha || []).forEach((item: any) => {
             const dt = converterData(item.data);
             if (!mapaDados[dt]) mapaDados[dt] = { mes_ano: dt };
             mapaDados[dt].vazao_calha = item.vazao_calha;
@@ -274,9 +264,13 @@ export const usePiezometroData = () => {
             // Para a IA, mandamos o raw se for porDia, ou o array se for mensal
             const dadosParaIA = porDia ? rawDadosFiltrados : dadosFiltrados;
 
-            // Verificação se tem dados para a IA (nivel_estatico no caso diário, ou tamanho do array no mensal)
+            // Verificação se tem dados para a IA
             const temDadosIA = porDia
-                ? (rawDadosFiltrados.nivel_estatico && rawDadosFiltrados.nivel_estatico.length > 0)
+                ? (
+                    (rawDadosFiltrados.nivel_estatico && rawDadosFiltrados.nivel_estatico.length > 0) ||
+                    (rawDadosFiltrados.precipitacao && rawDadosFiltrados.precipitacao.length > 0) ||
+                    (rawDadosFiltrados.vazao_calha && rawDadosFiltrados.vazao_calha.length > 0)
+                )
                 : (dadosFiltrados && dadosFiltrados.length > 0);
 
             if (temDadosIA) {
@@ -286,14 +280,6 @@ export const usePiezometroData = () => {
                     setAnaliseOriginalIA(iaResponse[0].output);
                 }
             }
-
-            const respostaColeta = await getColetaPorIdDataInicioDataFimApi(
-                idSelecionado,
-                inicioFormatado,
-                fimFormatado
-            );
-
-            setColetaDados(respostaColeta.data || []);
 
             let dados = [...dadosFiltrados].sort((a: any, b: any) => {
                 return new Date(a.mes_ano).getTime() - new Date(b.mes_ano).getTime();
@@ -639,23 +625,6 @@ export const usePiezometroData = () => {
         }
     }, [filters]);
 
-    const buscarAnaliseQuimica = useCallback(async (nRegistro: number) => {
-        if (analisesQuimicas[nRegistro]) return;
-
-        setCarregandoAnalise(prev => ({ ...prev, [nRegistro]: true }));
-
-        try {
-            const resposta = await getAnaliseQuimicaPorRegistro(nRegistro);
-            setAnalisesQuimicas(prev => ({
-                ...prev,
-                [nRegistro]: resposta.data
-            }));
-        } catch (error) {
-            console.error(`Erro ao buscar análise do registro ${nRegistro}:`, error);
-        } finally {
-            setCarregandoAnalise(prev => ({ ...prev, [nRegistro]: false }));
-        }
-    }, [analisesQuimicas]);
 
 
     // Efeitos
@@ -680,9 +649,6 @@ export const usePiezometroData = () => {
             total: 0
         });
         setTabelaDados([]);
-        setColetaDados([]);
-        setExpandedRows(null);
-        setAnalisesQuimicas({});
         setAnaliseIANivelEstatico(null);
         setAnaliseOriginalIA(null);
         setCarregandoIANivelEstatico(false);
@@ -703,16 +669,6 @@ export const usePiezometroData = () => {
         updateFilters,
         handleSelecionarPiezometro,
         buscarGrafico,
-
-        //relacionados as dados das coletas
-        coletaDados,
-        expandedRows,
-        setExpandedRows,
-
-        //relacionados as analises quimicas dentro de coletas
-        analisesQuimicas,
-        carregandoAnalise,
-        buscarAnaliseQuimica,
 
         // relacionados a analise ia nivel estatico
         analiseIANivelEstatico,
