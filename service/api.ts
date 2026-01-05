@@ -5,11 +5,6 @@ export const rota = axios.create({
     timeout: 2000000,
 });
 
-export const getHistoricoCompletoApi = (idZeus: number) => {
-    return rota.get(`/qualidade-agua/historico-completo/${idZeus}`);
-};
-
-
 export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number | string | null, filtros: string[], historico: any): Promise<string | null> => {
     const payload = {
         cdPiezometro: cdPiezometro,

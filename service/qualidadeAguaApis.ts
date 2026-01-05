@@ -35,6 +35,12 @@ export const postColetaCompletaFiltroApi = (idZeus: number, mesAnoInicio: string
     });
 };
 
+//pega todos os de um piezometro para mandar os dados como historico para o N8N
+export const getHistoricoCompletoApi = (idZeus: number) => {
+    return rota.get(`/qualidade-agua/historico-completo/${idZeus}`);
+};
+
+
 
 // =============================== DEPRECIADAS: 
 //foi substituida pelo postColetaCompletaFiltroApi, era usada quando não tinham os filtros na tela, como inclui os filtros, optei por um post 
