@@ -58,3 +58,19 @@ export const getPiezometrosAtivos = (tipos: any = null) => {
     }
     return rota.get("/piezometros/ativos", { params });
 };
+
+
+
+// =============================== DEPRECIADAS: 
+//essa aqui era usada para uma versão inicial do sistema que qualidade da água foi implementada junta do nível estático e não estamos mais usando, o componente é esse: components/GraficoPiezometro/ColetaTable.tsx, vou deixar aqui para caso de ouver a necessidade de reutiliza-lo
+
+
+// Usado para dados de coleta simples (GraficoPiezometro - Tabela Coleta)
+export const getColetaPorIdDataInicioDataFimApi = (id: number, inicio: string, fim: string) => {
+    return rota.get(`/relatorios/coleta/${id}/filtro`, {
+        params: {
+            mesAnoInicio: inicio,
+            mesAnoFim: fim
+        }
+    });
+};

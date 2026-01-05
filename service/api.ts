@@ -5,16 +5,6 @@ export const rota = axios.create({
     timeout: 2000000,
 });
 
-// Usado para dados de coleta simples (GraficoPiezometro - Tabela Coleta)
-export const getColetaPorIdDataInicioDataFimApi = (id: number, inicio: string, fim: string) => {
-    return rota.get(`/relatorios/coleta/${id}/filtro`, {
-        params: {
-            mesAnoInicio: inicio,
-            mesAnoFim: fim
-        }
-    });
-};
-
 // Usado no relatório de qualidade da água (QualidadeAgua)
 export const postColetaCompletaFiltroApi = (idZeus: number, mesAnoInicio: string, mesAnoFim: string, filtros: number[]) => {
     return rota.post("/qualidade-agua/coleta-completa/filtro-analises", {
