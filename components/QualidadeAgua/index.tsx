@@ -4,14 +4,13 @@ import { useState, useEffect } from "react";
 import FilterBar from "./FilterBar";
 import GraficosAnalise from "./GraficosAnalise";
 import AnaliseIA from "./AnaliseIA";
-import { getParametrosLegislacaoBuscaDadosRelacionados } from '@/service/api';
 import Swal from "sweetalert2";
 import { SplitButton } from 'primereact/splitbutton';
 import { saveAs } from 'file-saver';
 import { getPiezometrosRelatorio } from '@/service/qualidadeAguaApis';
 import { postColetaCompletaFiltroApi } from '@/service/qualidadeAguaApis';
 import { getHistoricoCompletoApi } from '@/service/qualidadeAguaApis';
-import { webHookIAAnaliseQualidade } from '@/service/qualidadeAguaApis';
+import { webHookIAAnaliseQualidade, getParametrosLegislacaoBuscaDadosRelacionados } from '@/service/qualidadeAguaApis';
 
 
 export type QualidadeAguaProps = {

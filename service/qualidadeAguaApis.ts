@@ -58,6 +58,9 @@ export const webHookIAAnaliseQualidade = async (dto: any, cdPiezometro: number |
     }
 };
 
+export const getParametrosLegislacaoBuscaDadosRelacionados = () => {
+    return rota.get("/parametros-legislacao/filtros");
+};
 
 
 // =============================== DEPRECIADAS: 

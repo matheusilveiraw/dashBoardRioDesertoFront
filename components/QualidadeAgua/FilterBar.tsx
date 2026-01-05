@@ -4,7 +4,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { getParametrosLegislacaoBuscaDadosRelacionados } from "@/service/api";
+import { getParametrosLegislacaoBuscaDadosRelacionados } from "@/service/qualidadeAguaApis";
 import { useState, useEffect } from "react";
 
 interface FilterBarProps {
