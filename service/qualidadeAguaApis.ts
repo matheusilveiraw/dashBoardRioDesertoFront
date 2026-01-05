@@ -24,3 +24,13 @@ export const getPiezometrosRelatorio = (tipos: string | string[] | null = null) 
     }
     return rota.get("/relatorios/piezometros-ativos", { params });
 };
+
+// Usado no relatório de qualidade da água (QualidadeAgua)
+export const postColetaCompletaFiltroApi = (idZeus: number, mesAnoInicio: string, mesAnoFim: string, filtros: number[]) => {
+    return rota.post("/qualidade-agua/coleta-completa/filtro-analises", {
+        idZeus,
+        mesAnoInicio,
+        mesAnoFim,
+        filtros
+    });
+};

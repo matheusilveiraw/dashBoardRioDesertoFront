@@ -5,15 +5,7 @@ export const rota = axios.create({
     timeout: 2000000,
 });
 
-// Usado no relatório de qualidade da água (QualidadeAgua)
-export const postColetaCompletaFiltroApi = (idZeus: number, mesAnoInicio: string, mesAnoFim: string, filtros: number[]) => {
-    return rota.post("/qualidade-agua/coleta-completa/filtro-analises", {
-        idZeus,
-        mesAnoInicio,
-        mesAnoFim,
-        filtros
-    });
-};
+
 
 export const getAnaliseQuimicaPorRegistro = (nRegistro: number) => {
     return rota.get(`/relatorios/coleta/analises-quimicas/${nRegistro}`);
