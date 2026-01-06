@@ -7,7 +7,7 @@ import AnaliseIA from "./AnaliseIA";
 import TabelaDadosPiezometro from "./TabelaDadosPiezometro";
 import { SplitButton } from 'primereact/splitbutton';
 
-import { usePiezometroData } from "@/hooks/usePiezometroData";
+import { useGerenciadorNivelEstatico } from "@/hooks/useGerenciadorNivelEstatico";
 import { useExportacaoRelatorioTelaNivelEstatico } from "@/hooks/useExportacaoRelatorioTelaNivelEstatico";
 import BarraFiltros from "./BarraFiltros";
 import Swal from "sweetalert2";
@@ -15,26 +15,27 @@ import Swal from "sweetalert2";
 export default function GraficoPiezometro() {
   const chartRef = useRef(null);
   const {
-    filters,
+    filtros,
     piezometros,
-    carregando,
-    lineData,
-    lineOptions,
+    estaCarregando,
+    estaCarregandoOpcoes,
+    dadosGrafico,
+    opcoesGrafico,
     tabelaDados,
-    opcoesFiltro,
-    updateFilters,
-    handleSelecionarPiezometro,
-    buscarGrafico,
-    analiseIANivelEstatico,
-    setAnaliseIANivelEstatico,
+    opcoesFiltroTipo,
+    atualizarFiltros,
+    aoSelecionarPiezometro,
+    aoBuscar,
+    analiseIA,
+    setAnaliseIA,
     analiseOriginalIA,
-    carregandoIANivelEstatico,
-  } = usePiezometroData();
+    estaCarregandoIA,
+  } = useGerenciadorNivelEstatico();
 
   const { aoGerarPdf, aoGerarWord } = useExportacaoRelatorioTelaNivelEstatico(
     chartRef as any,
     piezometros,
-    filters.idSelecionado
+    filtros.idSelecionado
   );
 
 
@@ -56,7 +57,7 @@ export default function GraficoPiezometro() {
       <div className="flex justify-content-between align-items-center mb-4">
         <h1>Nível Estático, precipitação e vazão</h1>
 
-        {analiseIANivelEstatico && (
+        {analiseIA && (
           <SplitButton
             label="Exportar"
             icon="pi pi-download"
@@ -69,50 +70,50 @@ export default function GraficoPiezometro() {
 
       {/* Barra de Filtros */}
       <BarraFiltros
-        opcoesFiltro={opcoesFiltro}
-        tipoFiltroSelecionado={filters.tipoFiltroSelecionado}
+        opcoesFiltro={opcoesFiltroTipo}
+        tipoFiltroSelecionado={filtros.tipoFiltroSelecionado}
         aoMudarTipoFiltro={(valor) =>
-          updateFilters({ tipoFiltroSelecionado: valor })
+          atualizarFiltros({ tipoFiltroSelecionado: valor })
         }
         piezometros={piezometros}
-        idSelecionado={filters.idSelecionado}
-        aoMudarPiezometro={handleSelecionarPiezometro}
-        estaCarregando={carregando}
-        dataInicio={filters.dataInicio}
-        dataFim={filters.dataFim}
-        aoMudarDataInicio={(valor) => updateFilters({ dataInicio: valor })}
-        aoMudarDataFim={(valor) => updateFilters({ dataFim: valor })}
-        porDia={filters.porDia}
-        aoMudarPorDia={(valor) => updateFilters({ porDia: valor })}
-        aoBuscar={buscarGrafico}
+        idSelecionado={filtros.idSelecionado}
+        aoMudarPiezometro={aoSelecionarPiezometro}
+        estaCarregando={estaCarregando || estaCarregandoOpcoes}
+        dataInicio={filtros.dataInicio}
+        dataFim={filtros.dataFim}
+        aoMudarDataInicio={(valor) => atualizarFiltros({ dataInicio: valor })}
+        aoMudarDataFim={(valor) => atualizarFiltros({ dataFim: valor })}
+        porDia={filtros.porDia}
+        aoMudarPorDia={(valor) => atualizarFiltros({ porDia: valor })}
+        aoBuscar={aoBuscar}
       />
 
       {/* GRÁFICO */}
       <GraficoTelaNivelEstatico
         ref={chartRef}
-        dadosGrafico={lineData}
-        opcoesGrafico={lineOptions}
-        tipoPiezometro={filters.tipoSelecionado}
+        dadosGrafico={dadosGrafico}
+        opcoesGrafico={opcoesGrafico}
+        tipoPiezometro={filtros.tipoSelecionado}
         tabelaDados={tabelaDados}
       />
 
       {/* ANÁLISE DA IA */}
       <div id="analise-ia-container" className="avoid-break mb-5">
         <AnaliseIA
-          analise={analiseIANivelEstatico}
+          analise={analiseIA}
           analiseOriginalIA={analiseOriginalIA}
-          estaCarregando={carregandoIANivelEstatico}
-          aoSalvar={(texto) => setAnaliseIANivelEstatico(texto)}
-          cdPiezometro={filters.idSelecionado}
+          estaCarregando={estaCarregandoIA}
+          aoSalvar={(texto) => setAnaliseIA(texto)}
+          cdPiezometro={filtros.idSelecionado}
         />
       </div>
 
       {/* LISTA DOS DADOS DA TABELA */}
-      {tabelaDados.length > 0 && filters.tipoSelecionado && (
+      {tabelaDados.length > 0 && filtros.tipoSelecionado && (
         <TabelaDadosPiezometro
           dados={tabelaDados}
-          tipoSelecionado={filters.tipoSelecionado}
-          porDia={filters.porDia}
+          tipoSelecionado={filtros.tipoSelecionado}
+          porDia={filtros.porDia}
         />
       )}
 
