@@ -12,8 +12,7 @@ interface PiezometroOption {
 
 /**
  * Hook customizado para gerenciar a exportação de relatórios (PDF e Word) na tela de Nível Estático.
- * 
- * Segue o princípio de Responsabilidade Única (SRP) ao isolar a manipulação de DOM e bibliotecas de exportação.
+ * Se refere ao: components/GraficoPiezometro/AnaliseIA.tsx
  */
 export const useExportacaoRelatorioTelaNivelEstatico = (
     chartRef: RefObject<Chart>,
