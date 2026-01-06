@@ -1,8 +1,8 @@
 //CORPO PRINCIPAL DO COMPONENTE DE GRÁFICO PIEZÔMETRO
 
 "use client";
-import { useRef, useState } from "react";
-import { Chart } from "primereact/chart";
+import { useRef } from "react";
+import GraficoTelaNivelEstatico from "./GraficoTelaNivelEstatico";
 import AnaliseIA from "./AnaliseIA";
 import TabelaDadosPiezometro from "./TabelaDadosPiezometro";
 import { SplitButton } from 'primereact/splitbutton';
@@ -13,23 +13,18 @@ import BarraFiltros from "./BarraFiltros";
 import Swal from "sweetalert2";
 
 export default function GraficoPiezometro() {
-  const chartRef = useRef<Chart>(null);
-  const [legendUpdate, setLegendUpdate] = useState(0);
+  const chartRef = useRef(null);
   const {
     filters,
     piezometros,
     carregando,
     lineData,
     lineOptions,
-    summary,
     tabelaDados,
     opcoesFiltro,
-
     updateFilters,
     handleSelecionarPiezometro,
     buscarGrafico,
-
-    // relacionados a analise ia nivel estatico
     analiseIANivelEstatico,
     setAnaliseIANivelEstatico,
     analiseOriginalIA,
@@ -37,82 +32,11 @@ export default function GraficoPiezometro() {
   } = usePiezometroData();
 
   const { aoGerarPdf, aoGerarWord } = useExportacaoRelatorioTelaNivelEstatico(
-    chartRef,
+    chartRef as any,
     piezometros,
     filters.idSelecionado
   );
 
-
-
-
-
-  // Handler de clique na legenda para esconder/mostrar datasets
-  const handleLegendClick = (datasetIndex: number) => {
-    const chart = chartRef.current?.getChart();
-    if (!chart) return;
-
-    const meta = chart.getDatasetMeta(datasetIndex);
-    meta.hidden = meta.hidden === null ? true : !meta.hidden;
-
-    chart.update();
-    setLegendUpdate(prev => prev + 1); // Força re-render da legenda
-  };
-
-  // Renderizar legenda do gráfico
-  const renderizarLegendaGrafico = () => {
-    if (!lineData) return null;
-
-    const chart = chartRef.current?.getChart();
-
-    return (
-      <div className="chart-legend">
-        {lineData.datasets.map((dataset: any, index: number) => {
-          const label =
-            dataset.label === "Cota Superfície" &&
-              filters.tipoSelecionado === "PR"
-              ? "Cota"
-              : dataset.label;
-
-          // Verifica se é uma linha tracejada (Início da Escavação ou outras)
-          const isTracejada = dataset.borderDash && dataset.borderDash.length > 0;
-
-          // Verifica se o dataset está oculto
-          const isHidden = chart ? chart.getDatasetMeta(index).hidden : false;
-
-          return (
-            <div
-              key={dataset.label}
-              className="legend-item"
-              onClick={() => handleLegendClick(index)}
-              style={{
-                cursor: 'pointer',
-                opacity: isHidden ? 0.5 : 1,
-                textDecoration: isHidden ? 'line-through' : 'none'
-              }}
-            >
-              {isTracejada ? (
-                <div
-                  className="legend-line-dashed"
-                  style={{
-                    width: '20px',
-                    height: '2px',
-                    background: `repeating-linear-gradient(90deg, ${dataset.borderColor} 0px, ${dataset.borderColor} 4px, transparent 4px, transparent 8px)`,
-                    marginRight: '6px'
-                  }}
-                ></div>
-              ) : (
-                <div
-                  className="legend-color"
-                  style={{ backgroundColor: dataset.borderColor }}
-                ></div>
-              )}
-              {label}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   const exportItems = [
     {
@@ -164,36 +88,13 @@ export default function GraficoPiezometro() {
       />
 
       {/* GRÁFICO */}
-      <div className="chart-container avoid-break">
-        <div className="chart-header">
-          <div className="chart-title">
-            {tabelaDados.length > 0 && filters.tipoSelecionado
-              ? `Dados do ${filters.tipoSelecionado === "PP" ||
-                filters.tipoSelecionado === "PR"
-                ? "Piezômetro"
-                : "Recurso Hídrico"
-              }`
-              : "Níveis Piezométricos e Dados Ambientais"}
-          </div>
-          {renderizarLegendaGrafico()}
-        </div>
-        {lineData ? (
-          <Chart
-            ref={chartRef}
-            type="line"
-            data={lineData}
-            options={lineOptions}
-            height="400px"
-          />
-        ) : (
-          <div
-            className="flex align-items-center justify-content-center"
-            style={{ height: "400px", color: "#666" }}
-          >
-            Selecione os filtros e clique em Aplicar para visualizar os dados
-          </div>
-        )}
-      </div>
+      <GraficoTelaNivelEstatico
+        ref={chartRef}
+        dadosGrafico={lineData}
+        opcoesGrafico={lineOptions}
+        tipoPiezometro={filters.tipoSelecionado}
+        tabelaDados={tabelaDados}
+      />
 
       {/* ANÁLISE DA IA */}
       <div id="analise-ia-container" className="avoid-break mb-5">
