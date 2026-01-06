@@ -427,10 +427,10 @@ export default function QualidadeAgua({
             )}
 
             <AnaliseIA
-                carregando={carregando}
+                estaCarregando={carregando}
                 analise={analiseIA}
                 analiseOriginalIA={analiseOriginalIA}
-                onSave={(text) => setAnaliseIA(text)}
+                aoSalvar={(texto) => setAnaliseIA(texto)}
                 idZeus={pontoSelecionado}
             />
         </div>
