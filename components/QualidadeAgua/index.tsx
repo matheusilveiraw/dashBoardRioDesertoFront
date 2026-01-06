@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import FilterBar from "./FilterBar";
+import BarraFiltros from "./BarraFiltros";
 import GraficosAnalise from "./GraficosAnalise";
 import AnaliseIA from "./AnaliseIA";
 import Swal from "sweetalert2";
@@ -402,21 +402,21 @@ export default function QualidadeAgua({
                 )}
             </div>
 
-            <FilterBar
+            <BarraFiltros
                 opcoesFiltro={opcoesFiltro}
                 tipoFiltroSelecionado={tipoFiltroSelecionado}
-                onTipoFiltroChange={setTipoFiltroSelecionado}
+                aoMudarTipoFiltro={setTipoFiltroSelecionado}
                 pontos={pontos}
                 pontoSelecionado={pontoSelecionado}
-                onPontoChange={setPontoSelecionado}
-                carregando={carregando}
+                aoMudarPonto={setPontoSelecionado}
+                estaCarregando={carregando}
                 dataInicio={dataInicio}
                 dataFim={dataFim}
-                onDataInicioChange={setDataInicio}
-                onDataFimChange={setDataFim}
-                onBuscar={handleBuscar}
+                aoMudarDataInicio={setDataInicio}
+                aoMudarDataFim={setDataFim}
+                aoBuscar={handleBuscar}
                 itensSelecionados={itensSelecionados}
-                onItensSelecionadosChange={setItensSelecionados}
+                aoMudarItensSelecionados={setItensSelecionados}
                 parametros={parametros}
             />
 
