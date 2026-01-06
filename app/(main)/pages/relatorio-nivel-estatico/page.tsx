@@ -3,9 +3,6 @@
 import React from 'react';
 import GraficoPiezometro from "@/components/GraficoPiezometro/index";
 
-/**
- * Página principal do Dashboard (Home).
- */
 const Dashboard = () => {
     return (
         <div className="grid">

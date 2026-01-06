@@ -35,7 +35,7 @@ const AppMenu = () => {
       items: [
         {
           label: "Nível Estático, Precipitação e Vazão",
-          to: "/",
+          to: "/pages/relatorio-nivel-estatico",
           icon: "pi pi-fw pi-chart-line",
         },
         {

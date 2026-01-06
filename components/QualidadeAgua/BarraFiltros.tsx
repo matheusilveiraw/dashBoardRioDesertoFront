@@ -1,83 +1,89 @@
 "use client";
 
+import React from "react";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { getParametrosLegislacaoBuscaDadosRelacionados } from "@/service/qualidadeAguaApis";
-import { useState, useEffect } from "react";
+import { useBarraFiltrosQualidadeAgua } from "@/hooks/useBarraFiltrosQualidadeAgua";
 
-interface FilterBarProps {
-    opcoesFiltro: any[];
+interface OpcaoFiltro {
+    label: string;
+    value: string | null;
+}
+
+interface PontoMonitoramento {
+    label: string;
+    value: number;
+}
+
+interface ParametroLegislacao {
+    id_analise: number;
+    id_parametro_legislacao: number;
+    nome: string;
+    simbolo: string;
+}
+
+interface PropriedadesBarraFiltros {
+    opcoesFiltro: OpcaoFiltro[];
     tipoFiltroSelecionado: string | null;
-    onTipoFiltroChange: (value: string | null) => void;
+    aoMudarTipoFiltro: (valor: string | null) => void;
 
-    pontos: any[];
+    pontos: PontoMonitoramento[];
     pontoSelecionado: number | null;
-    onPontoChange: (value: number) => void;
-    carregando: boolean;
+    aoMudarPonto: (valor: number) => void;
+    estaCarregando: boolean;
 
     dataInicio: Date | null;
     dataFim: Date | null;
-    onDataInicioChange: (value: Date | null) => void;
-    onDataFimChange: (value: Date | null) => void;
+    aoMudarDataInicio: (valor: Date | null) => void;
+    aoMudarDataFim: (valor: Date | null) => void;
 
-    onBuscar: () => void;
+    aoBuscar: () => void;
     itensSelecionados: number[];
-    onItensSelecionadosChange: (itens: number[]) => void;
-    parametros: any[];
+    aoMudarItensSelecionados: (itens: number[]) => void;
+    parametros: ParametroLegislacao[];
 }
 
-export default function FilterBar({
+/**
+ * Componente de barra de filtros para a tela de Qualidade da Água.
+ * 
+ * Permite filtrar por tipo de piezômetro, ponto de monitoramento, período
+ * e seleção específica de parâmetros analíticos.
+ */
+export default function BarraFiltros({
     opcoesFiltro,
     tipoFiltroSelecionado,
-    onTipoFiltroChange,
-
+    aoMudarTipoFiltro,
     pontos,
     pontoSelecionado,
-    onPontoChange,
-    carregando,
-
+    aoMudarPonto,
+    estaCarregando,
     dataInicio,
     dataFim,
-    onDataInicioChange,
-    onDataFimChange,
-
-    onBuscar,
+    aoMudarDataInicio,
+    aoMudarDataFim,
+    aoBuscar,
     itensSelecionados,
-    onItensSelecionadosChange,
+    aoMudarItensSelecionados,
     parametros,
-}: FilterBarProps) {
-    const [showFilters, setShowFilters] = useState(false);
-
-    const onToggleSelectAll = (e: any) => {
-        if (e.checked) {
-            onItensSelecionadosChange(parametros.map(p => p.id_analise));
-        } else {
-            onItensSelecionadosChange([]);
-        }
-    };
-
-    const onCheckboxChange = (id: number) => {
-        let _selecionados = [...itensSelecionados];
-        if (_selecionados.includes(id)) {
-            _selecionados = _selecionados.filter(item => item !== id);
-        } else {
-            _selecionados.push(id);
-        }
-        onItensSelecionadosChange(_selecionados);
-    };
+}: PropriedadesBarraFiltros) {
+    const {
+        mostrarFiltrosExtras,
+        aoAlternarTodos,
+        aoAlternarParametro,
+        alternarVisibilidadeFiltros
+    } = useBarraFiltrosQualidadeAgua(parametros, itensSelecionados, aoMudarItensSelecionados);
 
     return (
         <div className="flex flex-column gap-3">
             <div className="card filter-bar">
-
                 <div className="filter-item">
                     <span className="filter-label">Visualização</span>
                     <Dropdown
                         value={tipoFiltroSelecionado}
                         options={opcoesFiltro}
-                        onChange={(e) => onTipoFiltroChange(e.value)}
+                        onChange={(e) => aoMudarTipoFiltro(e.value)}
                         placeholder="Selecione o tipo"
                         className="w-full md:w-15rem"
                         showClear
@@ -89,12 +95,12 @@ export default function FilterBar({
                     <Dropdown
                         value={pontoSelecionado}
                         options={pontos}
-                        onChange={(e) => onPontoChange(e.value)}
-                        placeholder={carregando ? "Carregando..." : "Selecione..."}
+                        onChange={(e) => aoMudarPonto(e.value)}
+                        placeholder={estaCarregando ? "Carregando..." : "Selecione..."}
                         className="w-full md:w-14rem"
                         filter
                         showClear
-                        disabled={carregando}
+                        disabled={estaCarregando}
                         panelClassName="dropdown-panel-mobile"
                         appendTo="self"
                     />
@@ -105,7 +111,7 @@ export default function FilterBar({
                     <div className="flex gap-2">
                         <Calendar
                             value={dataInicio}
-                            onChange={(e: any) => onDataInicioChange(e.value)}
+                            onChange={(e: any) => aoMudarDataInicio(e.value)}
                             dateFormat="mm/yy"
                             view="month"
                             placeholder="Início"
@@ -115,7 +121,7 @@ export default function FilterBar({
                         />
                         <Calendar
                             value={dataFim}
-                            onChange={(e: any) => onDataFimChange(e.value)}
+                            onChange={(e: any) => aoMudarDataFim(e.value)}
                             dateFormat="mm/yy"
                             view="month"
                             placeholder="Fim"
@@ -132,27 +138,27 @@ export default function FilterBar({
                         className="text-primary font-bold no-underline"
                         onClick={(e) => {
                             e.preventDefault();
-                            setShowFilters(!showFilters);
+                            alternarVisibilidadeFiltros();
                         }}
                     >
-                        {showFilters ? "Fechar Filtros" : "Filtros"}
+                        {mostrarFiltrosExtras ? "Fechar Filtros" : "Filtros"}
                     </a>
                     <Button
                         label="APLICAR"
-                        onClick={onBuscar}
+                        onClick={aoBuscar}
                         className="p-button-warning font-bold"
-                        disabled={carregando}
+                        disabled={estaCarregando}
                     />
                 </div>
             </div>
 
-            {showFilters && (
+            {mostrarFiltrosExtras && (
                 <div className="card p-3 fadein animation-duration-200">
                     <div className="grid">
                         <div className="col-12 mb-3 flex align-items-center gap-2">
                             <Checkbox
                                 inputId="select-all"
-                                onChange={onToggleSelectAll}
+                                onChange={(e) => aoAlternarTodos(e.checked || false)}
                                 checked={itensSelecionados.length === parametros.length && parametros.length > 0}
                             />
                             <label htmlFor="select-all" className="font-bold cursor-pointer">Selecionar / desmarcar todos</label>
@@ -161,7 +167,7 @@ export default function FilterBar({
                             <div key={param.id_parametro_legislacao} className="col-12 md:col-4 lg:col-3 mb-2 flex align-items-center gap-2">
                                 <Checkbox
                                     inputId={`param-${param.id_analise}`}
-                                    onChange={() => onCheckboxChange(param.id_analise)}
+                                    onChange={() => aoAlternarParametro(param.id_analise)}
                                     checked={itensSelecionados.includes(param.id_analise)}
                                 />
                                 <label htmlFor={`param-${param.id_analise}`} className="cursor-pointer">
