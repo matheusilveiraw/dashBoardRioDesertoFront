@@ -8,13 +8,13 @@ import TabelaDadosPiezometro from "./TabelaDadosPiezometro";
 import { SplitButton } from 'primereact/splitbutton';
 
 import { usePiezometroData } from "@/hooks/usePiezometroData";
+import { useExportacaoRelatorioTelaNivelEstatico } from "@/hooks/useExportacaoRelatorioTelaNivelEstatico";
 import BarraFiltros from "./BarraFiltros";
-import { saveAs } from 'file-saver';
 import Swal from "sweetalert2";
 
 export default function GraficoPiezometro() {
   const chartRef = useRef<Chart>(null);
-  const [legendUpdate, setLegendUpdate] = useState(0); // Força re-render da legenda
+  const [legendUpdate, setLegendUpdate] = useState(0);
   const {
     filters,
     piezometros,
@@ -36,123 +36,13 @@ export default function GraficoPiezometro() {
     carregandoIANivelEstatico,
   } = usePiezometroData();
 
-  //ESSE CARA É O RESPONSA DE GERAR O PDF 
-  const handleGeneratePdf = async () => {
-    const chartCanvas = chartRef.current?.getCanvas();
-    const analiseIAEl = document.getElementById("textoApareceNoPdf");
-
-    if (!chartCanvas || !analiseIAEl) {
-      console.error("Não foi possível encontrar os elementos para gerar o PDF.");
-      return;
-    }
-
-    const finalPrintContainer = document.createElement("div");
-    finalPrintContainer.style.padding = "20px";
-
-    const selectedPiezometer = piezometros.find(p => p.value === filters.idSelecionado);
-    const piezometerName = selectedPiezometer ? selectedPiezometer.label : 'Não selecionado';
-
-    const piezometerNameEl = document.createElement("h3");
-    piezometerNameEl.textContent = `${piezometerName}:`;
-    piezometerNameEl.style.marginBottom = "20px";
-    piezometerNameEl.style.color = "#000";
-
-    finalPrintContainer.appendChild(piezometerNameEl);
-
-    const reportContainer = document.createElement("div");
-    reportContainer.style.backgroundColor = "#333";
-    reportContainer.style.color = "#fff";
-    reportContainer.style.padding = "20px";
-
-    const chartHeaderEl = document
-      .querySelector(".chart-header")
-      ?.cloneNode(true);
-    if (chartHeaderEl) {
-      reportContainer.appendChild(chartHeaderEl);
-    }
-
-    const chartDataURL = chartCanvas.toDataURL("image/png");
-    const chartImage = document.createElement("img");
-    chartImage.src = chartDataURL;
-    chartImage.style.width = "100%";
-    reportContainer.appendChild(chartImage);
-
-    finalPrintContainer.appendChild(reportContainer);
-
-    const analiseText = (analiseIAEl as HTMLElement).innerText;
-    const analiseContainer = document.createElement('div');
-    analiseContainer.style.marginTop = '20px';
-
-    const lines = analiseText.split('\n');
-    lines.forEach(line => {
-      const p = document.createElement('p');
-      p.textContent = line || '\u00A0';
-      p.style.color = 'black';
-      p.style.margin = '0';
-      p.style.breakInside = 'avoid';
-      analiseContainer.appendChild(p);
-    });
-    finalPrintContainer.appendChild(analiseContainer);
+  const { aoGerarPdf, aoGerarWord } = useExportacaoRelatorioTelaNivelEstatico(
+    chartRef,
+    piezometros,
+    filters.idSelecionado
+  );
 
 
-    const html2pdf = (await import("html2pdf.js")).default;
-
-    const opt = {
-      margin: 1,
-      filename: "grafico-e-analise.pdf",
-      image: { type: "jpeg" as const, quality: 0.98 },
-      html2canvas: { scale: 2, letterRendering: true },
-      jsPDF: { unit: "in", format: "letter", orientation: "landscape" as const },
-    };
-
-    html2pdf().from(finalPrintContainer).set(opt).save();
-  };
-
-  const handleGenerateWord = async () => {
-    const chartCanvas = chartRef.current?.getCanvas();
-    const analiseIAEl = document.getElementById("textoApareceNoPdf");
-
-    if (!chartCanvas || !analiseIAEl) {
-      console.error("Não foi possível encontrar os elementos para gerar o Word.");
-      return;
-    }
-
-    const selectedPiezometer = piezometros.find(p => p.value === filters.idSelecionado);
-    const piezometerName = selectedPiezometer ? selectedPiezometer.label : 'Não selecionado';
-
-    const chartDataURL = chartCanvas.toDataURL("image/png");
-
-    const analiseText = (analiseIAEl as HTMLElement).innerText;
-    const analiseLines = analiseText.split('\n').map(line => `<p style="margin: 0;">${line || '&nbsp;'}</p>`).join('');
-
-    const htmlString = `
-      <div style="font-family: Arial; padding: 20px;">
-        <h3 style="color: #000; margin-bottom: 20px;">${piezometerName}:</h3>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="${chartDataURL}" style="width: 600px;" />
-        </div>
-
-        <div style="margin-top: 20px; color: #000;">
-          ${analiseLines} 
-        </div>
-      </div>
-    `;
-
-    const opt = {
-      orientation: 'landscape' as const,
-      margins: { top: 720, right: 720, bottom: 720, left: 720 },
-    };
-
-    try {
-      const htmlToDocx = (await import('html-to-docx')).default;
-      const fileBuffer = await htmlToDocx(htmlString, null, opt);
-      saveAs(fileBuffer as Blob, "grafico-e-analise.docx");
-    } catch (error) {
-      console.error("Erro ao gerar Word:", error);
-      Swal.fire({ icon: 'error', title: 'Erro ao gerar Word', text: 'Ocorreu um problema ao tentar exportar para Word.' });
-    }
-  };
 
 
 
@@ -228,12 +118,12 @@ export default function GraficoPiezometro() {
     {
       label: 'PDF',
       icon: 'pi pi-file-pdf',
-      command: handleGeneratePdf
+      command: aoGerarPdf
     },
     {
       label: 'Word',
       icon: 'pi pi-file-word',
-      command: handleGenerateWord
+      command: aoGerarWord
     }
   ];
 
@@ -247,7 +137,7 @@ export default function GraficoPiezometro() {
             label="Exportar"
             icon="pi pi-download"
             model={exportItems}
-            onClick={handleGeneratePdf}
+            onClick={aoGerarPdf}
             className="p-button-secondary"
           />
         )}
