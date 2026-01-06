@@ -432,8 +432,8 @@ export default function GraficoPiezometro() {
         <AnaliseIA
           analise={analiseIANivelEstatico}
           analiseOriginalIA={analiseOriginalIA}
-          carregando={carregandoIANivelEstatico}
-          onSave={(text) => setAnaliseIANivelEstatico(text)}
+          estaCarregando={carregandoIANivelEstatico}
+          aoSalvar={(texto) => setAnaliseIANivelEstatico(texto)}
           cdPiezometro={filters.idSelecionado}
         />
       </div>

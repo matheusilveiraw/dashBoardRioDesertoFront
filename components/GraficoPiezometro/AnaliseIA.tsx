@@ -1,100 +1,42 @@
 "use client";
 
-import { useState } from "react";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
+import { useAnaliseIATelaRelNivelEstatico } from "@/hooks/useAnaliseIATelaRelNivelEstatico";
 
-import Swal from "sweetalert2";
-
-import { salvarAvaliacaoIA } from "@/service/nivelEstaticoApis";
-
-interface AnaliseIAProps {
+interface AnaliseIAPropriedades {
     analise: string | null;
     analiseOriginalIA: string | null;
-    carregando: boolean;
-    onSave: (text: string) => void;
+    estaCarregando: boolean;
+    aoSalvar: (texto: string) => void;
     cdPiezometro: number | null;
 }
 
-export default function AnaliseIA({ analise, analiseOriginalIA, carregando, onSave, cdPiezometro }: AnaliseIAProps) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedText, setEditedText] = useState("");
+/**
+ * Componente para exibição e gerenciamento da análise gerada por IA.
+ * 
+ * Segue os princípios de Responsabilidade Única (SRP) ao delegar a lógica para um hook customizado.
+ */
+export default function AnaliseIA({
+    analise,
+    analiseOriginalIA,
+    estaCarregando,
+    aoSalvar,
+    cdPiezometro
+}: AnaliseIAPropriedades) {
 
-    const handleAvaliar = () => {
-        if (!cdPiezometro) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Atenção',
-                text: 'Selecione um piezômetro para avaliar a análise.'
-            });
-            return;
-        }
+    const {
+        estaEditando,
+        textoEditado,
+        setTextoEditado,
+        aoAvaliar,
+        aoEditar,
+        aoSalvarEdicao,
+        aoCancelarEdicao
+    } = useAnaliseIATelaRelNivelEstatico(analise, analiseOriginalIA, aoSalvar, cdPiezometro);
 
-        Swal.fire({
-            title: 'Avaliar Análise da IA',
-            html: `
-                <div class="flex flex-column gap-3">
-                    <div class="flex flex-column align-items-start">
-                        <label for="swal-rating" class="mb-2 font-bold">Nota (1 a 10):</label>
-                        <input id="swal-rating" type="number" min="1" max="10" class="swal2-input w-full m-0" placeholder="1-10">
-                    </div>
-                    <div class="flex flex-column align-items-start mt-3">
-                        <label for="swal-comment" class="mb-2 font-bold">Comentário:</label>
-                        <textarea id="swal-comment" class="swal2-textarea w-full m-0" rows="5" placeholder="Digite seu comentário sobre a análise"></textarea>
-                    </div               </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: 'Salvar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#22C55E',
-            cancelButtonColor: '#64748B',
-            preConfirm: () => {
-                const rating = (document.getElementById('swal-rating') as HTMLInputElement).value;
-                const comment = (document.getElementById('swal-comment') as HTMLTextAreaElement).value;
-                if (!rating || parseInt(rating) < 1 || parseInt(rating) > 10) {
-                    Swal.showValidationMessage('Por favor, informe uma nota de 1 a 10');
-                    return false;
-                }
-                return { rating: parseInt(rating), comment };
-            }
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const editouAnalise = analise !== analiseOriginalIA;
-
-                    const response = await salvarAvaliacaoIA({
-                        cdPiezometro: cdPiezometro,
-                        editouAnalise: editouAnalise,
-                        analiseOriginal: analiseOriginalIA,
-                        analiseEditada: editouAnalise ? (analise ?? undefined) : undefined,
-                        nota: result.value.rating,
-                        comentario: result.value.comment
-                    });
-
-                    const { title, text } = response.data;
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: title,
-                        text: text,
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } catch (error: any) {
-                    console.error('Erro ao salvar avaliação:', error);
-                    const { title, text } = error.response?.data || {};
-                    Swal.fire({
-                        icon: 'error',
-                        title: title,
-                        text: text
-                    });
-                }
-            }
-        });
-    };
-
-    if (carregando) {
+    if (estaCarregando) {
         return (
             <div className="card mt-4">
                 <div className="flex align-items-center">
@@ -106,31 +48,16 @@ export default function AnaliseIA({ analise, analiseOriginalIA, carregando, onSa
     }
 
     if (analise) {
-        const handleEdit = () => {
-            setEditedText(analise);
-            setIsEditing(true);
-        };
-
-        const handleSave = () => {
-            onSave(editedText);
-            setIsEditing(false);
-        };
-
-        const handleCancel = () => {
-            setEditedText("");
-            setIsEditing(false);
-        };
-
         return (
             <div className="card mt-4">
                 <div className="flex justify-content-between align-items-center mb-3">
                     <h5 className="m-0">Análise da IA</h5>
-                    {!isEditing ? (
+                    {!estaEditando ? (
                         <div className="flex gap-2">
                             <Button
                                 label="Avaliar"
                                 icon="pi pi-star"
-                                onClick={handleAvaliar}
+                                onClick={aoAvaliar}
                                 size="small"
                                 severity="info"
                                 outlined
@@ -138,7 +65,7 @@ export default function AnaliseIA({ analise, analiseOriginalIA, carregando, onSa
                             <Button
                                 label="Editar"
                                 icon="pi pi-pencil"
-                                onClick={handleEdit}
+                                onClick={aoEditar}
                                 size="small"
                             />
                         </div>
@@ -147,26 +74,26 @@ export default function AnaliseIA({ analise, analiseOriginalIA, carregando, onSa
                             <Button
                                 label="Salvar"
                                 icon="pi pi-check"
-                                onClick={handleSave}
+                                onClick={aoSalvarEdicao}
                                 size="small"
                                 severity="success"
                             />
                             <Button
                                 label="Cancelar"
                                 icon="pi pi-times"
-                                onClick={handleCancel}
+                                onClick={aoCancelarEdicao}
                                 size="small"
                                 severity="secondary"
                             />
                         </div>
                     )}
                 </div>
-                {!isEditing ? (
+                {!estaEditando ? (
                     <div id="textoApareceNoPdf" style={{ whiteSpace: 'pre-line' }}>{analise}</div>
                 ) : (
                     <InputTextarea
-                        value={editedText}
-                        onChange={(e) => setEditedText(e.target.value)}
+                        value={textoEditado}
+                        onChange={(e) => setTextoEditado(e.target.value)}
                         rows={15}
                         className="w-full"
                         autoResize
@@ -177,4 +104,4 @@ export default function AnaliseIA({ analise, analiseOriginalIA, carregando, onSa
     }
 
     return null;
-} 
+}
