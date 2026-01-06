@@ -9,7 +9,7 @@ import AnaliseIA from "./AnaliseIA";
 import { SplitButton } from 'primereact/splitbutton';
 
 import { usePiezometroData } from "@/hooks/usePiezometroData";
-import FilterBar from "./FilterBar";
+import BarraFiltros from "./BarraFiltros";
 import { saveAs } from 'file-saver';
 import Swal from "sweetalert2";
 
@@ -376,23 +376,23 @@ export default function GraficoPiezometro() {
       </div>
 
       {/* Barra de Filtros */}
-      <FilterBar
+      <BarraFiltros
         opcoesFiltro={opcoesFiltro}
         tipoFiltroSelecionado={filters.tipoFiltroSelecionado}
-        onTipoFiltroChange={(value) =>
-          updateFilters({ tipoFiltroSelecionado: value })
+        aoMudarTipoFiltro={(valor) =>
+          updateFilters({ tipoFiltroSelecionado: valor })
         }
         piezometros={piezometros}
         idSelecionado={filters.idSelecionado}
-        onPiezometroChange={handleSelecionarPiezometro}
-        carregando={carregando}
+        aoMudarPiezometro={handleSelecionarPiezometro}
+        estaCarregando={carregando}
         dataInicio={filters.dataInicio}
         dataFim={filters.dataFim}
-        onDataInicioChange={(value) => updateFilters({ dataInicio: value })}
-        onDataFimChange={(value) => updateFilters({ dataFim: value })}
+        aoMudarDataInicio={(valor) => updateFilters({ dataInicio: valor })}
+        aoMudarDataFim={(valor) => updateFilters({ dataFim: valor })}
         porDia={filters.porDia}
-        onPorDiaChange={(value) => updateFilters({ porDia: value })}
-        onBuscar={buscarGrafico}
+        aoMudarPorDia={(valor) => updateFilters({ porDia: valor })}
+        aoBuscar={buscarGrafico}
       />
 
       {/* GRÁFICO */}
