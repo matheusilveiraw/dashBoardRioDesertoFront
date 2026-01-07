@@ -205,6 +205,40 @@ export const useExportacaoRelatorioTelaNivelEstatico = (
                 <div style="margin-top: 20px; color: #000;">
                     ${linhasAnaliseHtml} 
                 </div>
+                ${fotosInspecao && fotosInspecao.length > 0 ? `
+                <div style="margin-top: 30px;">
+                    <h4 style="color: #000; margin-bottom: 15px;">Fotos de Inspeção</h4>
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc;">
+                        <thead>
+                            <tr style="background-color: #f4f4f4;">
+                                <th style="border: 1px solid #ccc; padding: 8px; color: #000;">Ponto</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; color: #000;">Data</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; color: #000;">Hora</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; color: #000;">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${fotosInspecao.map(foto => {
+            const dataObj = new Date(foto.dataInsercao);
+            const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+            const horaFormatada = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            return `
+                                    <tr>
+                                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center; color: #000;">${foto.idPiezometro || 'N/A'}</td>
+                                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center; color: #000;">${dataFormatada}</td>
+                                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center; color: #000;">${horaFormatada}</td>
+                                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center; color: #000;">
+                                            <div style="width: 120px; height: 80px; background-color: #f0f0f0; border: 1px dashed #ccc; margin: auto;">
+                                                [FOTO]
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+        }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ` : ''}
             </div>
         `;
 
