@@ -86,7 +86,6 @@ export const useExportacaoRelatorioTelaNivelEstatico = (
         if (fotosInspecao && fotosInspecao.length > 0) {
             const containerFotos = document.createElement('div');
             containerFotos.style.marginTop = '30px';
-            containerFotos.style.breakBefore = 'page'; // Força que as fotos comecem em uma nova página se necessário
 
             const tituloFotos = document.createElement('h4');
             tituloFotos.textContent = 'Fotos de Inspeção';
