@@ -59,6 +59,9 @@ export const getPiezometrosAtivos = (tipos: any = null) => {
     return rota.get("/piezometros/ativos", { params });
 };
 
+export const getFotosInspecaoPiezometroApi = (cdPiezometro: number | string | null) => {
+    return rota.get(`/fotos-inspecao/piezometro/${cdPiezometro}`);
+};
 
 
 // =============================== DEPRECIADAS: 
