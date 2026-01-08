@@ -3,6 +3,7 @@
 import React from 'react';
 import { Carousel } from 'primereact/carousel';
 import { Skeleton } from 'primereact/skeleton';
+import Image from 'next/image';
 
 interface FotoInspecao {
     idFoto: number;
@@ -19,7 +20,7 @@ interface PropriedadesCarrossel {
 
 /**
  * Componente que exibe um carrossel de "fotos" das inspeções.
- * Como as fotos ainda não estão acessíveis pelo servidor, exibimos as informações do arquivo.
+ * Utiliza o componente Next/Image para otimização e carregamento de fontes remotas.
  */
 export default function CarrosselFotosInspecao({ fotos, estaCarregando }: PropriedadesCarrossel) {
 
@@ -41,16 +42,17 @@ export default function CarrosselFotosInspecao({ fotos, estaCarregando }: Propri
     const templateFoto = (foto: FotoInspecao) => {
         return (
             <div className="p-2 h-full">
-                <div className="surface-card p-4 shadow-2 border-round border-1 border-300 flex flex-column align-items-center justify-content-center text-center h-15rem bg-gray-50">
-                    <i className="pi pi-image text-4xl text-400 mb-3"></i>
-                    <div className="text-900 font-bold mb-2 line-height-3 text-sm" style={{ wordBreak: 'break-all' }}>
-                        {foto.nmArquivo}
-                    </div>
-                    <div className="text-600 text-xs mb-3">
+                <div className="surface-card shadow-2 border-round border-1 border-300 flex align-items-center justify-content-center h-25rem relative overflow-hidden bg-black-alpha-10">
+                    <Image
+                        src={foto.caminhoCompleto}
+                        alt={foto.nmArquivo}
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        unoptimized // Adicionado para evitar problemas com o otimizador de imagens em ambientes de desenvolvimento com IPs locais
+                    />
+                    {/* Caption Overlay */}
+                    <div className="absolute bottom-0 left-0 w-full bg-black-alpha-50 text-white p-2 text-center text-sm">
                         {formatarDataHora(foto.dataInsercao)}
-                    </div>
-                    <div className="text-500 text-xs font-italic surface-200 p-2 border-round w-full overflow-hidden text-overflow-ellipsis" title={foto.caminhoCompleto}>
-                        {foto.caminhoCompleto}
                     </div>
                 </div>
             </div>
@@ -92,3 +94,4 @@ export default function CarrosselFotosInspecao({ fotos, estaCarregando }: Propri
         </div>
     );
 }
+
