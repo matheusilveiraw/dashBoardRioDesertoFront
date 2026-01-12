@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getApiGeralContadores } from "@/service/visaoGeralApis";
+import Swal from "sweetalert2";
 
 interface ContadoresData {
     contadoresZeus: number;
@@ -14,14 +15,41 @@ export default function GeralPage() {
     const [contadores, setContadores] = useState<ContadoresData>({ contadoresZeus: 0, contadoresRdLab: 0 });
 
     useEffect(() => {
+        Swal.fire({
+            title: 'Carregando...',
+            text: 'Buscando contadores...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
         getApiGeralContadores()
             .then((response) => {
                 setContadores(response.data);
+                Swal.close();
             })
             .catch((error) => {
                 console.error("Erro ao buscar contadores:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Falha ao carregar contadores.'
+                });
             });
+
+        return () => {
+            Swal.close();
+        };
     }, []);
+
+    const handleNavigation = (path: string) => {
+        Swal.fire({
+            title: 'Carregando...',
+            text: 'Acessando módulo...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+        router.push(path);
+    };
 
     return (
         <div className="grid">
@@ -40,7 +68,7 @@ export default function GeralPage() {
             <div className="col-12 md:col-6 lg:col-4">
                 <div
                     className="card mb-0 hover:surface-100 cursor-pointer transition-duration-200"
-                    onClick={() => router.push('/pages/relatorio-nivel-estatico')}
+                    onClick={() => handleNavigation('/pages/relatorio-nivel-estatico')}
                 >
                     <div className="flex justify-content-between mb-3">
                         <div>
@@ -62,7 +90,7 @@ export default function GeralPage() {
             <div className="col-12 md:col-6 lg:col-4">
                 <div
                     className="card mb-0 hover:surface-100 cursor-pointer transition-duration-200"
-                    onClick={() => router.push('/pages/qualidade-agua')}
+                    onClick={() => handleNavigation('/pages/qualidade-agua')}
                 >
                     <div className="flex justify-content-between mb-3">
                         <div>
@@ -82,7 +110,7 @@ export default function GeralPage() {
             <div className="col-12 md:col-6 lg:col-4">
                 <div
                     className="card mb-0 hover:surface-100 cursor-pointer transition-duration-200"
-                    onClick={() => router.push('/pages/mapa')}
+                    onClick={() => handleNavigation('/pages/mapa')}
                 >
                     <div className="flex justify-content-between mb-3">
                         <div>
