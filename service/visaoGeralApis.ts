@@ -8,3 +8,7 @@ export const rota = axios.create({
 export const getApiGeralContadores = () => {
     return rota.get("/api/geral/contadores");
 };
+
+export const apiGeralUltimosMovimentosRdLab = () => {
+    return rota.get("/api/geral/ultimos-movimentos-rd-lab");
+};

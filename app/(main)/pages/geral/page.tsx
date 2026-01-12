@@ -2,37 +2,54 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getApiGeralContadores } from "@/service/visaoGeralApis";
+import { getApiGeralContadores, apiGeralUltimosMovimentosRdLab } from "@/service/visaoGeralApis";
 import Swal from "sweetalert2";
+import { Carousel } from 'primereact/carousel';
 
 interface ContadoresData {
     contadoresZeus: number;
     contadoresRdLab: number;
 }
 
+interface MovimentoRdLab {
+    data: string;
+    identificacao: number;
+    coletor: string;
+    n_registro: number;
+    codigo: number;
+    id_zeus: number;
+    cd_piezometro: number;
+    nm_piezometro: string;
+}
+
 export default function GeralPage() {
     const router = useRouter();
     const [contadores, setContadores] = useState<ContadoresData>({ contadoresZeus: 0, contadoresRdLab: 0 });
+    const [movimentos, setMovimentos] = useState<MovimentoRdLab[]>([]);
 
     useEffect(() => {
         Swal.fire({
             title: 'Carregando...',
-            text: 'Buscando contadores...',
+            text: 'Buscando informações...',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
         });
 
-        getApiGeralContadores()
-            .then((response) => {
-                setContadores(response.data);
+        Promise.all([
+            getApiGeralContadores(),
+            apiGeralUltimosMovimentosRdLab()
+        ])
+            .then(([resContadores, resMovimentos]) => {
+                setContadores(resContadores.data);
+                setMovimentos(resMovimentos.data || []);
                 Swal.close();
             })
             .catch((error) => {
-                console.error("Erro ao buscar contadores:", error);
+                console.error("Erro ao buscar dados da dashboard:", error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro',
-                    text: 'Falha ao carregar contadores.'
+                    text: 'Falha ao carregar informações da dashboard.'
                 });
             });
 
@@ -49,6 +66,38 @@ export default function GeralPage() {
             didOpen: () => Swal.showLoading()
         });
         router.push(path);
+    };
+
+    const templateMovimento = (movimento: MovimentoRdLab) => {
+        const dataFormatada = movimento.data.split('-').reverse().join('/');
+
+        return (
+            <div className="p-2">
+                <div className="surface-card shadow-2 border-round p-3 h-full">
+                    <div className="flex align-items-center justify-content-between mb-3">
+                        <span className="text-xl font-bold text-900">{movimento.nm_piezometro}</span>
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-calendar text-blue-500"></i>
+                            <span className="text-700 font-medium">{dataFormatada}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-column gap-2">
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-user text-primary"></i>
+                            <span className="text-600">Coletor:</span>
+                            <span className="text-900 font-medium">{movimento.coletor}</span>
+                        </div>
+
+                        <div className="flex align-items-center gap-2">
+                            <i className="pi pi-hashtag text-primary"></i>
+                            <span className="text-600">Registro:</span>
+                            <span className="text-900 font-medium">{movimento.n_registro}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -126,18 +175,29 @@ export default function GeralPage() {
                 </div>
             </div>
 
+            {/* Carrossel de Últimos Movimentos */}
             <div className="col-12">
                 <div className="card">
-                    <h5>Resumo do Sistema</h5>
-                    <p className="line-height-3 m-0">
-                        Utilize os cards acima para navegar rapidamente entre os módulos do sistema.
-                    </p>
-
-                    <div className="mt-4 p-4 surface-50 border-round border-1 surface-border flex flex-column align-items-center justify-content-center text-500">
-                        <i className="pi pi-chart-bar text-3xl mb-2"></i>
-                        <span>Gráficos consolidados e alertas do sistema aparecerão aqui.</span>
-                        <small className="text-400 mt-1">(Aguardando implementação de API de Resumo)</small>
-                    </div>
+                    <h5>Últimos Movimentos RD Lab</h5>
+                    {movimentos.length > 0 ? (
+                        <Carousel
+                            value={movimentos}
+                            numVisible={3}
+                            numScroll={1}
+                            responsiveOptions={[
+                                { breakpoint: '1400px', numVisible: 2, numScroll: 1 },
+                                { breakpoint: '1199px', numVisible: 2, numScroll: 1 },
+                                { breakpoint: '767px', numVisible: 1, numScroll: 1 }
+                            ]}
+                            itemTemplate={templateMovimento}
+                            circular
+                            autoplayInterval={5000}
+                        />
+                    ) : (
+                        <div className="p-4 text-center text-500">
+                            Nenhum movimento recente encontrado.
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
