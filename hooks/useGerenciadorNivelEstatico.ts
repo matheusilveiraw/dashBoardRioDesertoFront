@@ -67,9 +67,12 @@ export const useGerenciadorNivelEstatico = () => {
     const [estaCarregandoFotos, setEstaCarregandoFotos] = useState(false);
 
     // 3. Ferramenta de Configuração Visual do Gráfico
+    // PB (Piezômetro de Bacia) compartilha a mesma estrutura de dados do PP (Piezômetro de Profundidade)
+    const tipoParaGrafico = filtros.tipoSelecionado === 'PB' ? 'PP' : filtros.tipoSelecionado;
+
     const { dadosGrafico, opcoesGrafico } = useConfiguracaoGraficoNivelEstatico(
         tabelaDados,
-        filtros.tipoSelecionado,
+        tipoParaGrafico,
         filtros.porDia,
         filtros.dataInicio,
         filtros.dataFim

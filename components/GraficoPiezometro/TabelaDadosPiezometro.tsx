@@ -58,7 +58,7 @@ export default function TabelaDadosPiezometro({
             />,
         ];
 
-        if (tipoSelecionado === "PP") {
+        if (tipoSelecionado === "PP" || tipoSelecionado === "PB") {
             colunas.push(
                 <Column
                     key="nivel_estatico"

@@ -46,8 +46,6 @@ interface MovimentoZeus {
     dados?: MovimentoZeusDados;
 }
 
-
-
 export default function GeralPage() {
     const router = useRouter();
     const [contadores, setContadores] = useState<ContadoresData>({ contadoresZeus: 0, contadoresRdLab: 0 });
@@ -138,7 +136,7 @@ export default function GeralPage() {
 
     const templateMovimentoZeus = (movimento: MovimentoZeus) => {
         const dataFormatada = movimento.dt_inspecao ? movimento.dt_inspecao.split('-').reverse().join('/') : '-';
-        const ehNivel = movimento.tp_piezometro === 'PP' || movimento.tp_piezometro === 'PR';
+        const ehNivel = movimento.tp_piezometro === 'PP' || movimento.tp_piezometro === 'PR' || movimento.tp_piezometro === 'PB';
         const ehVazao = movimento.tp_piezometro === 'PC' || movimento.tp_piezometro === 'PV';
 
         return (
@@ -177,7 +175,7 @@ export default function GeralPage() {
                             <div className="flex align-items-center gap-2">
                                 <i className="pi pi-water text-blue-500"></i>
                                 <span className="text-600">Vazão:</span>
-                                <span className="text-900 font-medium">{movimento.vazao !== null ? movimento.vazao : '-'}</span>
+                                <span className="text-900 font-medium">{movimento.vazao !== null ? movimento.vazao : '-'} m³/h</span>
                             </div>
                         )}
 

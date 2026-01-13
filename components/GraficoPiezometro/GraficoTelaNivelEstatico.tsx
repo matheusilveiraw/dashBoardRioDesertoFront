@@ -90,7 +90,7 @@ const GraficoTelaNivelEstatico = forwardRef<Chart, PropriedadesGrafico>(
                 <div className="chart-header">
                     <div className="chart-title">
                         {tabelaDados.length > 0 && tipoPiezometro
-                            ? `Dados do ${tipoPiezometro === "PP" || tipoPiezometro === "PR"
+                            ? `Dados do ${tipoPiezometro === "PP" || tipoPiezometro === "PR" || tipoPiezometro === "PB"
                                 ? "Piezômetro"
                                 : "Recurso Hídrico"
                             }`

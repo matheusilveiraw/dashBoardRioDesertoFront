@@ -46,7 +46,8 @@ export const useFiltrosNivelEstatico = () => {
         { label: "PP - Piezômetro de Profundidade", value: "PP" },
         { label: "PR - Régua", value: "PR" },
         { label: "PV - Ponto de Vazão", value: "PV" },
-        { label: "PC - Calhas", value: "PC" }
+        { label: "PC - Calhas", value: "PC" },
+        { label: "PB - Piezômetro de Bacia", value: "PB" },
     ];
 
     // Carrega a lista de piezômetros baseada na categoria selecionada
@@ -56,10 +57,7 @@ export const useFiltrosNivelEstatico = () => {
             const filtroArray = tipoCategoria ? [tipoCategoria] : [];
             const resposta = await getPiezometrosAtivos(filtroArray);
 
-            // Filtramos PB (Piezo-Borehole) que não entram neste relatório
-            const piezometrosFiltrados = resposta.data.filter((p: any) => p.tipoPiezometro !== "PB");
-
-            const formatados = piezometrosFiltrados.map((p: any) => ({
+            const formatados = resposta.data.map((p: any) => ({
                 label: `${p.idPiezometro} - ${p.nomePiezometro} (${p.tipoPiezometro})`,
                 value: p.cdPiezometro,
                 tipo: p.tipoPiezometro
