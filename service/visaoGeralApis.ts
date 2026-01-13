@@ -12,3 +12,7 @@ export const getApiGeralContadores = () => {
 export const apiGeralUltimosMovimentosRdLab = () => {
     return rota.get("/api/geral/ultimos-movimentos-rd-lab");
 };
+
+export const apiGeralUltimosMovimentosZeus = () => {
+    return rota.get("/api/geral/ultimos-movimentos-zeus");
+};
