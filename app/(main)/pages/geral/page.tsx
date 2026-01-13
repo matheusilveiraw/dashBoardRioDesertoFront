@@ -24,6 +24,12 @@ interface MovimentoRdLab {
     //tp_piezometro?: string;
 }
 
+interface MovimentoZeusDados {
+    menor_leitura: boolean;
+    maior_leitura: boolean;
+    media: boolean;
+}
+
 interface MovimentoZeus {
     origem: string;
     id: number;
@@ -37,7 +43,10 @@ interface MovimentoZeus {
     id_piezometro: string;
     nm_piezometro: string;
     tp_piezometro: string;
+    dados?: MovimentoZeusDados;
 }
+
+
 
 export default function GeralPage() {
     const router = useRouter();
@@ -176,6 +185,35 @@ export default function GeralPage() {
                             <div className="flex align-items-start gap-2 mt-2 pt-2 border-top-1 border-200">
                                 <i className="pi pi-info-circle text-orange-500 mt-1"></i>
                                 <span className="text-600 text-sm font-italic">{movimento.ds_observacao}</span>
+                            </div>
+                        )}
+
+                        {/* Alertas e Indicadores */}
+                        {movimento.dados && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {movimento.dados.maior_leitura && (
+                                    <span className="inline-flex align-items-center gap-1 px-2 py-1 border-round bg-red-100 text-red-700 text-xs font-bold">
+                                        <i className="pi pi-exclamation-circle text-red-700"></i>
+                                        Maior leitura já vista
+                                    </span>
+                                )}
+                                {movimento.dados.menor_leitura && (
+                                    <span className="inline-flex align-items-center gap-1 px-2 py-1 border-round bg-red-100 text-red-700 text-xs font-bold">
+                                        <i className="pi pi-exclamation-circle text-red-700"></i>
+                                        Menor leitura já vista
+                                    </span>
+                                )}
+                                {movimento.dados.media ? (
+                                    <span className="inline-flex align-items-center gap-1 px-2 py-1 border-round bg-green-100 text-green-700 text-xs font-bold" title="Acima da média">
+                                        <i className="pi pi-arrow-up text-green-700"></i>
+                                        Acima da média
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex align-items-center gap-1 px-2 py-1 border-round bg-orange-100 text-orange-700 text-xs font-bold" title="Abaixo da média">
+                                        <i className="pi pi-arrow-down text-orange-700"></i>
+                                        Abaixo da média
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>
